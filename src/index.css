@@ -1,0 +1,9 @@
+/* ═══════════════════════════════════════════════════
+   奶茶记录仪 — 主样式入口
+   Tailwind v4 + 设计 Token + 全局样式 + 动画
+   ═══════════════════════════════════════════════════ */
+
+@import "tailwindcss";
+@import "./styles/tokens.css";
+@import "./styles/global.css";
+@import "./styles/animations.css";

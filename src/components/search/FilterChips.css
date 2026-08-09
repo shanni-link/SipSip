@@ -1,0 +1,85 @@
+/* ═══════════════════════════════════════════════════
+   FilterChips — 激活的筛选条件标签
+   横向滚动 + 单个×移除 + 清除全部
+   ═══════════════════════════════════════════════════ */
+
+.filter-chips {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-4);
+}
+
+.filter-chips__scroll {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 2px;
+}
+
+.filter-chips__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-chips__chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px 4px 12px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--color-tea-100);
+  color: var(--color-tea-700);
+  font-family: var(--font-family-body);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all var(--duration-fast) var(--ease-default);
+  line-height: 1.5;
+}
+
+.filter-chips__chip:hover {
+  background: var(--color-tea-200);
+  color: var(--color-tea-800);
+}
+
+.filter-chips__chip:active {
+  transform: scale(0.95);
+}
+
+.filter-chips__chip-label {
+  pointer-events: none;
+}
+
+.filter-chips__chip-x {
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.filter-chips__clear-all {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-divider);
+  background: transparent;
+  color: var(--color-text-hint);
+  font-family: var(--font-family-body);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--duration-fast) var(--ease-default);
+  line-height: 1.5;
+}
+
+.filter-chips__clear-all:hover {
+  border-color: var(--color-tea-300);
+  color: var(--color-tea-600);
+  background: var(--color-tea-50);
+}

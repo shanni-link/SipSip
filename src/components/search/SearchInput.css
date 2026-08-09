@@ -1,0 +1,105 @@
+/* ═══════════════════════════════════════════════════
+   SearchInput — 搜索输入框
+   暖色调圆角搜索栏 + 搜索图标 + 清除按钮
+   ═══════════════════════════════════════════════════ */
+
+.search-input {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  background: var(--color-tea-50);
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-full);
+  padding: 0 var(--spacing-4);
+  height: 40px;
+  transition: all var(--duration-fast) var(--ease-default);
+}
+
+.search-input:focus-within {
+  background: var(--color-surface);
+  border-color: var(--color-tea-400);
+  box-shadow: 0 0 0 3px rgba(139, 107, 72, 0.12);
+}
+
+.search-input__icon {
+  flex-shrink: 0;
+  color: var(--color-text-hint);
+  transition: color var(--duration-fast) var(--ease-default);
+}
+
+.search-input:focus-within .search-input__icon {
+  color: var(--color-tea-500);
+}
+
+.search-input__field {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: var(--font-family-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  line-height: 1.5;
+  min-width: 0;
+}
+
+.search-input__field::placeholder {
+  color: var(--color-text-hint);
+  font-family: var(--font-family-body);
+}
+
+.search-input__clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--color-tea-200);
+  color: var(--color-tea-600);
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: all var(--duration-fast) var(--ease-default);
+}
+
+.search-input__clear:hover {
+  background: var(--color-tea-300);
+  color: var(--color-tea-700);
+}
+
+.search-input__clear:active {
+  transform: scale(0.9);
+}
+
+/* ═══════════════════════ 搜索悬浮面板 ═══════════════════════ */
+
+.search-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.search-overlay__panel {
+  position: relative;
+  z-index: 2;
+  padding: var(--spacing-3) var(--spacing-4);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-divider);
+  box-shadow: var(--shadow-md);
+  pointer-events: auto;
+  animation: fade-in-up 200ms var(--ease-out);
+}
+
+.search-overlay__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(47, 31, 18, 0.25);
+  pointer-events: auto;
+  animation: fade-in 150ms var(--ease-out);
+}

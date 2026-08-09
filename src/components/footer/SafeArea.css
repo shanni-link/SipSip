@@ -1,0 +1,14 @@
+/* ═══════════════════════════════════════════════════
+   SafeArea — iPhone 底部安全区适配
+   ═══════════════════════════════════════════════════ */
+
+.safe-area {
+  display: flex;
+  flex-direction: column;
+}
+
+.safe-area__spacer {
+  height: env(safe-area-inset-bottom, 0px);
+  min-height: env(safe-area-inset-bottom, 0px);
+  flex-shrink: 0;
+}

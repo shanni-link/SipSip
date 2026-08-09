@@ -1,0 +1,117 @@
+/* ═══════════════════════════════════════════════════
+   奶茶记录仪 — 设计 Token
+   基于 design-system.md v2
+   ═══════════════════════════════════════════════════ */
+
+@theme {
+  /* === 主色 — 奶茶棕家族 === */
+  --color-tea-50:  #fbf5ed;
+  --color-tea-100: #f5e6d3;
+  --color-tea-200: #ebd3b0;
+  --color-tea-300: #d4b68a;
+  --color-tea-400: #b8946e;
+  --color-tea-500: #8b6b4a;
+  --color-tea-600: #6b4f34;
+  --color-tea-700: #4d3724;
+  --color-tea-800: #2f1f12;
+  --color-tea-900: #1a0f06;
+
+  /* === 强调色 — 印章朱红 === */
+  --color-accent:       #c94a3a;
+  --color-accent-light: #e57363;
+  --color-accent-dark:  #9e3527;
+
+  /* === 语义色 === */
+  --color-success: #5a8f6c;
+  --color-warning: #d4943a;
+  --color-error:   #c94a3a;
+  --color-info:    #7a9eb3;
+
+  /* === 中性色 === */
+  --color-surface:      #fffdf7;
+  --color-border:       #e0cfb5;
+  --color-divider:      #ede0cf;
+  --color-text-primary:   var(--color-tea-800);
+  --color-text-secondary: var(--color-tea-600);
+  --color-text-hint:      var(--color-tea-400);
+  --color-text-inverse:   #fffdf7;
+
+  /* === 品牌小票色 === */
+  --color-brand-heytea:       #1a1a1a;
+  --color-brand-heytea-sub:   #c9a87c;
+  --color-brand-nayuki:       #2d5a27;
+  --color-brand-nayuki-sub:   #8bab7a;
+  --color-brand-mxbc:         #d40016;
+  --color-brand-mxbc-sub:     #ff6b6b;
+  --color-brand-chabaidao:    #1a5276;
+  --color-brand-chabaidao-sub:#5dade2;
+  --color-brand-bwcj:         #4a235a;
+  --color-brand-bwcj-sub:     #d4a574;
+  --color-brand-default:      #5d4037;
+  --color-brand-default-sub:  #a08060;
+
+  /* === 字体 === */
+  --font-family-display: 'Noto Serif SC', 'Source Han Serif SC', 'STSong', serif;
+  --font-family-body:    'Zen Kaku Gothic New', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-family-receipt: 'Courier New', 'FZXiaoBiaoSong-B05S', 'Cascadia Code', monospace;
+  --font-family-stamp:   'Ma Shan Zheng', 'ZCOOL QingKe HuangYou', cursive;
+  --font-family-marker:  'ZCOOL KuaiLe', cursive;
+
+  /* === 字号 === */
+  --text-xs:   10px;
+  --text-sm:   12px;
+  --text-base: 15px;
+  --text-md:   17px;
+  --text-lg:   20px;
+  --text-xl:   24px;
+  --text-2xl:  32px;
+  --text-3xl:  40px;
+
+  /* === 字重 === */
+  --font-weight-normal:   400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  /* === 间距 (4px 基准) === */
+  --spacing-1:  4px;
+  --spacing-2:  8px;
+  --spacing-3:  12px;
+  --spacing-4:  16px;
+  --spacing-5:  20px;
+  --spacing-6:  24px;
+  --spacing-8:  32px;
+  --spacing-10: 40px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+
+  /* === 圆角 === */
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-full: 9999px;
+
+  /* === 阴影 === */
+  --shadow-sm:   0 1px 3px  rgba(47,31,18,0.06);
+  --shadow-md:   0 4px 16px rgba(47,31,18,0.10);
+  --shadow-lg:   0 8px 30px rgba(47,31,18,0.14);
+  --shadow-glow: 0 0 20px  rgba(212,148,58,0.25);
+
+  /* === 缓动 === */
+  --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in:      cubic-bezier(0.4, 0, 1, 1);
+  --ease-out:     cubic-bezier(0, 0, 0.2, 1);
+  --ease-bounce:  cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-spring:  cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  --ease-stamp:   cubic-bezier(0.25, 0.46, 0.45, 1.4);
+
+  /* === 时长 === */
+  --duration-instant: 100ms;
+  --duration-fast:    150ms;
+  --duration-normal:  300ms;
+  --duration-slow:    500ms;
+  --duration-tear:    600ms;
+  --duration-stamp:   400ms;
+  --duration-fly:     600ms;
+}

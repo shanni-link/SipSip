@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧾 复古小票 — 最终版</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════════════════
+   复古收据 · 统一纸底 · 品牌字色 · 抠图置顶
+   ══════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --serif: 'Noto Serif SC', 'SimSun', serif;
+  --mono:  'Courier New', Courier, 'SimSun', monospace;
+  --marker: 'Ma Shan Zheng', 'Noto Serif SC', cursive;
+}
+
+body {
+  background: #e8e0d5;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: #2f1f12;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  padding: 32px 12px;
+}
+
+.page-title {
+  text-align: center;
+  margin-bottom: 6px;
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 700;
+  color: #4d3724;
+  letter-spacing: 0.06em;
+}
+.page-note {
+  text-align: center;
+  font-size: 11px;
+  color: #8b6b4a;
+  margin-bottom: 3px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   网格
+   ══════════════════════════════════════════════════════════ */
+.comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 36px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+.brand-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.brand-label {
+  font-family: var(--serif);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/* ══════════════════════════════════════════════════════════
+   小票容器
+   ══════════════════════════════════════════════════════════ */
+.receipt {
+  width: 100%;
+  max-width: 380px;
+  background: #fdfaf5;
+  padding: 18px 20px 18px;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.04),
+    0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* ══════════════════════════════════════════════════════════
+   抠图 — 顶部居中
+   ══════════════════════════════════════════════════════════ */
+.receipt__cutout-top {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6px 0 10px;
+}
+.receipt__cutout-top img {
+  max-width: 170px;
+  max-height: 170px;
+  object-fit: contain;
+  display: block;
+  filter:
+    drop-shadow( 0   1px 0 rgba(255,255,255,0.82))
+    drop-shadow( 0  -1px 0 rgba(255,255,255,0.82))
+    drop-shadow( 1px  0  0 rgba(255,255,255,0.82))
+    drop-shadow(-1px  0  0 rgba(255,255,255,0.82))
+    drop-shadow( 0   0 1.2px rgba(255,255,255,0.55));
+}
+
+/* ══════════════════════════════════════════════════════════
+   ASCII 分割线
+   ══════════════════════════════════════════════════════════ */
+.receipt__divider {
+  border: none;
+  margin: 5px 0;
+  font-size: 13px;
+  line-height: 1;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.receipt__divider::before {
+  content: '--------------------------------';
+  display: block;
+  letter-spacing: -0.5px;
+}
+.receipt__divider--dots::before {
+  content: '-  -  -  -  -  -  -  -  -  -  -  -  -  -  -';
+}
+
+/* ══════════════════════════════════════════════════════════
+   space-between 行
+   ══════════════════════════════════════════════════════════ */
+.receipt__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+.receipt__label { white-space: nowrap; color: #6b4f34; }
+
+/* ══════════════════════════════════════════════════════════
+   店名 — 品牌色 + 衬线体
+   ══════════════════════════════════════════════════════════ */
+.receipt__brand-name {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.receipt__store {
+  font-size: 12px;
+  color: #6b4f34;
+}
+
+/* ══════════════════════════════════════════════════════════
+   序号 + 品名 + 价格
+   ══════════════════════════════════════════════════════════ */
+.receipt__item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  line-height: 1.6;
+}
+.receipt__item-no {
+  width: 3ch;
+  flex-shrink: 0;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: #8b6b4a;
+}
+.receipt__item-name {
+  flex: 1;
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 700;
+}
+.receipt__item-price {
+  text-align: right;
+  flex-shrink: 0;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: bold;
+  margin-left: 1ch;
+}
+
+.receipt__specs {
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.6;
+  padding-left: 3ch;
+  color: #555;
+}
+
+/* ══════════════════════════════════════════════════════════
+   评分
+   ══════════════════════════════════════════════════════════ */
+.receipt__stars {
+  font-family: var(--serif);
+  font-size: 14px;
+  letter-spacing: 3px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   心情行 — 手写体 + 语音按钮（SVG 喇叭）
+   ══════════════════════════════════════════════════════════ */
+.receipt__mood-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  line-height: 1.6;
+}
+.receipt__mood-label {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: #6b4f34;
+  white-space: nowrap;
+}
+.receipt__mood-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: right;
+}
+.receipt__mood-text {
+  font-family: var(--marker);
+  font-size: 15px;
+  color: #4d3724;
+  line-height: 1.4;
+}
+.receipt__voice-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.15s, opacity 0.15s;
+  padding: 0;
+  opacity: 0.6;
+}
+.receipt__voice-btn:hover { opacity: 1; }
+.receipt__voice-btn:active {
+  transform: scale(0.9);
+}
+
+/* ══════════════════════════════════════════════════════════
+   打印时间
+   ══════════════════════════════════════════════════════════ */
+.receipt__footer {
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: #999;
+  margin-top: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   品牌配色映射
+   ══════════════════════════════════════════════════════════ */
+
+/* 喜茶 #1a1a1a / #c9a87c */
+.receipt--heytea .receipt__brand-name,
+.receipt--heytea .receipt__item-name,
+.receipt--heytea .receipt__item-price,
+.receipt--heytea .receipt__stars { color: #1a1a1a; }
+.receipt--heytea .receipt__divider::before,
+.receipt--heytea .receipt__divider--dots::before { color: #c9a87c; opacity: 0.65; }
+.receipt--heytea .receipt__voice-btn { color: #c9a87c; border-color: #c9a87c; }
+
+/* 奈雪 #2d5a27 / #8bab7a */
+.receipt--nayuki .receipt__brand-name,
+.receipt--nayuki .receipt__item-name,
+.receipt--nayuki .receipt__item-price,
+.receipt--nayuki .receipt__stars { color: #2d5a27; }
+.receipt--nayuki .receipt__divider::before,
+.receipt--nayuki .receipt__divider--dots::before { color: #8bab7a; opacity: 0.65; }
+.receipt--nayuki .receipt__voice-btn { color: #8bab7a; border-color: #8bab7a; }
+
+/* 蜜雪冰城 #d40016 / #ff6b6b */
+.receipt--mxbc .receipt__brand-name,
+.receipt--mxbc .receipt__item-name,
+.receipt--mxbc .receipt__item-price,
+.receipt--mxbc .receipt__stars { color: #d40016; }
+.receipt--mxbc .receipt__divider::before,
+.receipt--mxbc .receipt__divider--dots::before { color: #ff6b6b; opacity: 0.5; }
+.receipt--mxbc .receipt__voice-btn { color: #ff6b6b; border-color: #ff6b6b; }
+
+/* 茶百道 #1a5276 / #5dade2 */
+.receipt--chabaidao .receipt__brand-name,
+.receipt--chabaidao .receipt__item-name,
+.receipt--chabaidao .receipt__item-price,
+.receipt--chabaidao .receipt__stars { color: #1a5276; }
+.receipt--chabaidao .receipt__divider::before,
+.receipt--chabaidao .receipt__divider--dots::before { color: #5dade2; opacity: 0.6; }
+.receipt--chabaidao .receipt__voice-btn { color: #5dade2; border-color: #5dade2; }
+
+/* 霸王茶姬 #4a235a / #d4a574 */
+.receipt--bwcj .receipt__brand-name,
+.receipt--bwcj .receipt__item-name,
+.receipt--bwcj .receipt__item-price,
+.receipt--bwcj .receipt__stars { color: #4a235a; }
+.receipt--bwcj .receipt__divider::before,
+.receipt--bwcj .receipt__divider--dots::before { color: #d4a574; opacity: 0.65; }
+.receipt--bwcj .receipt__voice-btn { color: #d4a574; border-color: #d4a574; }
+
+/* 默认 #5d4037 / #a08060 */
+.receipt--default .receipt__brand-name,
+.receipt--default .receipt__item-name,
+.receipt--default .receipt__item-price,
+.receipt--default .receipt__stars { color: #5d4037; }
+.receipt--default .receipt__divider::before,
+.receipt--default .receipt__divider--dots::before { color: #a08060; opacity: 0.65; }
+.receipt--default .receipt__voice-btn { color: #a08060; border-color: #a08060; }
+
+/* ══════════════════════════════════════════════════════════
+   响应式
+   ══════════════════════════════════════════════════════════ */
+@media (max-width: 400px) {
+  .receipt { max-width: 100%; padding: 16px 12px 14px; }
+  .receipt__brand-name { font-size: 15px; }
+  .receipt__item-name { font-size: 16px; }
+  .receipt__cutout-top img { max-width: 140px; max-height: 140px; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-title">复古小票 · 统一纸底 · 品牌字色</div>
+<div class="page-note">抠图置顶 · 衬线品名 · 心情+语音 · 等宽数据</div>
+<div class="page-note" style="margin-bottom:28px;">Serif(Noto Serif SC) + Mono(Courier New) + Marker(Ma Shan Zheng 马山正)</div>
+
+<div class="comparison-grid">
+
+  <!-- ═══ 喜茶 ═══ -->
+  <div class="brand-col">
+    <span class="brand-label" style="color:#1a1a1a;">喜茶 HEYTEA</span>
+    <div class="receipt receipt--heytea">
+
+      <!-- 抠图置顶 -->
+      <div class="receipt__cutout-top">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Ccircle cx='70' cy='62' r='42' fill='%23f5e6d3' stroke='%23c9a87c' stroke-width='2.5'/%3E%3Crect x='34' y='88' width='72' height='18' rx='9' fill='%23ebd3b0'/%3E%3Ctext x='70' y='68' text-anchor='middle' font-size='36'%3E🧋%3C/text%3E%3C/svg%3E" alt="多肉葡萄" />
+      </div>
+
+      <div class="receipt__divider"></div>
+
+      <!-- 店名·门店 -->
+      <div class="receipt__row">
+        <span class="receipt__label">店名</span>
+        <span class="receipt__brand-name">喜茶 HEYTEA</span>
+      </div>
+      <div class="receipt__row">
+        <span class="receipt__label">门店</span>
+        <span class="receipt__store">中山公园店</span>
+      </div>
+
+      <div class="receipt__divider"></div>
+
+      <!-- 品名 + 价格 -->
+      <div class="receipt__item-row">
+        <span class="receipt__item-no">01</span>
+        <span class="receipt__item-name">多肉葡萄</span>
+        <span class="receipt__item-price">¥18.00</span>
+      </div>
+      <div class="receipt__specs">大杯 · 少冰 · 半糖</div>
+      <div class="receipt__specs">+ 珍珠 / 脆波波</div>
+
+      <div class="receipt__divider"></div>
+
+      <!-- 评分 -->
+      <div class="receipt__row">
+        <span class="receipt__label">评分</span>
+        <span class="receipt__stars">★★★★☆</span>
+      </div>
+      <div class="receipt__row">
+        <span class="receipt__label">合计</span>
+        <span class="receipt__item-price">¥ 18.00</span>
+      </div>
+
+      <div class="receipt__divider"></div>
+
+      <!-- 心情 + 语音 -->
+      <div class="receipt__mood-row">
+        <span class="receipt__mood-label">心情</span>
+        <div class="receipt__mood-content">
+          <span class="receipt__mood-text">"今天超开心！"</span>
+          <button class="receipt__voice-btn" title="播放心情语音"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button>
+        </div>
+      </div>
+
+      <div class="receipt__divider--dots" style="margin:5px 0;"></div>
+
+      <div class="receipt__footer">打印时间 2026-06-22 14:30:00</div>
+    </div>
+  </div>
+
+  <!-- ═══ 奈雪 ═══ -->
+  <div class="brand-col">
+    <span class="brand-label" style="color:#2d5a27;">奈雪の茶 NAYUKI</span>
+    <div class="receipt receipt--nayuki">
+
+      <div class="receipt__cutout-top">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Ccircle cx='70' cy='62' r='42' fill='%23e0f0e0' stroke='%238bab7a' stroke-width='2.5'/%3E%3Crect x='34' y='88' width='72' height='18' rx='9' fill='%23c8e0c8'/%3E%3Ctext x='70' y='68' text-anchor='middle' font-size='36'%3E🍃%3C/text%3E%3C/svg%3E" alt="霸气草莓" />
+      </div>
+
+      <div class="receipt__divider"></div>
+
+      <div class="receipt__row">
+        <span class="receipt__label">店名</span>
+        <span class="receipt__brand-name">奈雪の茶</span>
+      </div>
+      <div class="receipt__row">
+        <span class="receipt__label">门店</span>
+        <span class="receipt__store">万达广场店</span>
+      </div>
+
+      <div class="receipt__divider"></div>
+
+      <div class="receipt__item-row">
+        <span class="receipt__item-no">01</span>
+        <span class="receipt__item-name">霸气草莓</span>
+        <span class="receipt__item-price">¥22.00</span>
+      </div>
+      <div class="receipt__specs">中杯 · 正常冰 · 全糖</div>
+      <div class="receipt__specs">+ 芝士奶盖</div>
+
+      <div class="receipt__divider"></div>
+
+      <div class="receipt__row">
+        <span class="receipt__label">评分</span>
+        <span class="receipt__stars">★★★★★</span>
+      </div>
+      <div class="receipt__row">
+        <span class="receipt__label">合计</span>
+        <span class="receipt__item-price">¥ 22.00</span>
+      </div>
+
+      <div class="receipt__divider"></div>
+
+      <div class="receipt__mood-row">
+        <span class="receipt__mood-label">心情</span>
+        <div class="receipt__mood-content">
+          <span class="receipt__mood-text">"草莓超新鲜~"</span>
+          <button class="receipt__voice-btn" title="播放心情语音"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button>
+        </div>
+      </div>
+
+      <div class="receipt__divider--dots" style="margin:5px 0;"></div>
+
+      <div class="receipt__footer">打印时间 2026-06-23 12:15:00</div>
+    </div>
+  </div>
+
+  <!-- ═══ 蜜雪冰城 ═══ -->
+  <div class="brand-col">
+    <span class="brand-label" style="color:#d40016;">蜜雪冰城 MXBC</span>
+    <div class="receipt receipt--mxbc">
+
+      <div class="receipt__cutout-top">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Ccircle cx='70' cy='62' r='42' fill='%23ffe8e8' stroke='%23ff6b6b' stroke-width='2.5'/%3E%3Crect x='34' y='88' width='72' height='18' rx='9' fill='%23ffd0d0'/%3E%3Ctext x='70' y='68' text-anchor='middle' font-size='36'%3E🍦%3C/text%3E%3C/svg%3E" alt="柠檬水" />
+      </div>
+
+      <div class="receipt__divider"></div>
+
+      <div class="receipt__row">
+        <span class="receipt__label">店名</span>
+        <span class="receipt__brand-name">蜜雪冰城</span>
+      </div>
+      <div class="receipt__row">
+        <span class="receipt__label">门店</span>
+        <span class="receipt__store">大学城店</span>
+      </div>
+
+      <div class="receipt__divider"></div>
+
+      <div class="receipt__item-row">
+        <span class="receipt__item-no">01</span>
+        <span class="receipt__item-name">柠檬水</span>
+        <span class="receipt__item-price">¥4.00</span>
+      </div>
+      <div class="receipt__specs">大杯 · 正常冰 · 全糖</div>
+
+      <div class="receipt__divider"></div>
+
+      <div class="receipt__row">
+        <span class="receipt__label">评分</span>
+        <span class="receipt__stars">★★★☆☆</span>
+      </div>
+      <div class="receipt__row">
+        <span class="receipt__label">合计</span>
+        <span class="receipt__item-price">¥ 4.00</span>
+      </div>
+
+      <div class="receipt__divider"></div>
+
+      <div class="receipt__mood-row">
+        <span class="receipt__mood-label">心情</span>
+        <div class="receipt__mood-content">
+          <span class="receipt__mood-text">"便宜又好喝"</span>
+          <button class="receipt__voice-btn" title="播放心情语音"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button>
+        </div>
+      </div>
+
+      <div class="receipt__divider--dots" style="margin:5px 0;"></div>
+
+      <div class="receipt__footer">打印时间 2026-06-24 15:40:00</div>
+    </div>
+  </div>
+
+  <!-- ═══ 茶百道 ═══ -->
+  <div class="brand-col">
+    <span class="brand-label" style="color:#1a5276;">茶百道 CHABAIDAO</span>
+    <div class="receipt receipt--chabaidao">
+
+      <div class="receipt__cutout-top">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Ccircle cx='70' cy='62' r='42' fill='%23d8e8f8' stroke='%235dade2' stroke-width='2.5'/%3E%3Crect x='34' y='88' width='72' height='18' rx='9' fill='%23b8d8f0'/%3E%3Ctext x='70' y='68' text-anchor='middle' font-size='36'%3E🥤%3C/text%3E%3C/svg%3E" alt="桂花酒酿" />
+      </div>
+
+      <div class="receipt__divider"></div>
+
+      <div class="receipt__row">
+        <span class="receipt__label">店名</span>
+        <span class="receipt__brand-name">茶百道</span>
+      </div>
+      <div class="receipt__row">
+        <span class="receipt__label">门店</span>
+        <span class="receipt__store">万象城店</span>
+      </div>
+
+      <div class="receipt__divider"></div>
+
+      <div class="receipt__item-row">
+        <span class="receipt__item-no">01</span>
+        <span class="receipt__item-name">桂花酒酿</span>
+        <span class="receipt__item-price">¥15.00</span>
+      </div>
+      <div class="receipt__specs">中杯 · 温热 · 半糖</div>
+      <div class="receipt__specs">+ 小芋圆</div>
+
+      <div class="receipt__divider"></div>
+
+      <div class="receipt__row">
+        <span class="receipt__label">评分</span>
+        <span class="receipt__stars">★★★★☆</span>
+      </div>
+      <div class="receipt__row">
+        <span class="receipt__label">合计</span>
+        <span class="receipt__item-price">¥ 15.00</span>
+      </div>
+
+      <div class="receipt__divider"></div>
+
+      <div class="receipt__mood-row">
+        <span class="receipt__mood-label">心情</span>
+        <div class="receipt__mood-content">
+          <span class="receipt__mood-text">"桂花香很浓~"</span>
+          <button class="receipt__voice-btn" title="播放心情语音"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button>
+        </div>
+      </div>
+
+      <div class="receipt__divider--dots" style="margin:5px 0;"></div>
+
+      <div class="receipt__footer">打印时间 2026-06-25 18:20:00</div>
+    </div>
+  </div>
+
+  <!-- ═══ 霸王茶姬 ═══ -->
+  <div class="brand-col">
+    <span class="brand-label" style="color:#4a235a;">霸王茶姬 BWCJ</span>
+    <div class="receipt receipt--bwcj">
+
+      <div class="receipt__cutout-top">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Ccircle cx='70' cy='62' r='42' fill='%23f0e0f0' stroke='%23d4a574' stroke-width='2.5'/%3E%3Crect x='34' y='88' width='72' height='18' rx='9' fill='%23e0c8e0'/%3E%3Ctext x='70' y='68' text-anchor='middle' font-size='36'%3E🍵%3C/text%3E%3C/svg%3E" alt="伯牙绝弦" />
+      </div>
+
+      <div class="receipt__divider"></div>
+
+      <div class="receipt__row">
+        <span class="receipt__label">店名</span>
+        <span class="receipt__brand-name">霸王茶姬</span>
+      </div>
+      <div class="receipt__row">
+        <span class="receipt__label">门店</span>
+        <span class="receipt__store">太古里店</span>
+      </div>
+
+      <div class="receipt__divider"></div>
+
+      <div class="receipt__item-row">
+        <span class="receipt__item-no">01</span>
+        <span class="receipt__item-name">伯牙绝弦</span>
+        <span class="receipt__item-price">¥20.00</span>
+      </div>
+      <div class="receipt__specs">大杯 · 少冰 · 半糖</div>
+      <div class="receipt__specs">+ 奶油顶</div>
+
+      <div class="receipt__divider"></div>
+
+      <div class="receipt__row">
+        <span class="receipt__label">评分</span>
+        <span class="receipt__stars">★★★★★</span>
+      </div>
+      <div class="receipt__row">
+        <span class="receipt__label">合计</span>
+        <span class="receipt__item-price">¥ 20.00</span>
+      </div>
+
+      <div class="receipt__divider"></div>
+
+      <div class="receipt__mood-row">
+        <span class="receipt__mood-label">心情</span>
+        <div class="receipt__mood-content">
+          <span class="receipt__mood-text">"花香四溢~"</span>
+          <button class="receipt__voice-btn" title="播放心情语音"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button>
+        </div>
+      </div>
+
+      <div class="receipt__divider--dots" style="margin:5px 0;"></div>
+
+      <div class="receipt__footer">打印时间 2026-06-26 10:05:00</div>
+    </div>
+  </div>
+
+  <!-- ═══ 默认 ═══ -->
+  <div class="brand-col">
+    <span class="brand-label" style="color:#5d4037;">其他品牌 DEFAULT</span>
+    <div class="receipt receipt--default">
+
+      <div class="receipt__cutout-top">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Ccircle cx='70' cy='62' r='42' fill='%23f5e6d3' stroke='%23a08060' stroke-width='2.5'/%3E%3Crect x='34' y='88' width='72' height='18' rx='9' fill='%23ebd3b0'/%3E%3Ctext x='70' y='68' text-anchor='middle' font-size='36'%3E🫖%3C/text%3E%3C/svg%3E" alt="珍珠奶茶" />
+      </div>
+
+      <div class="receipt__divider"></div>
+
+      <div class="receipt__row">
+        <span class="receipt__label">店名</span>
+        <span class="receipt__brand-name">COCO 都可</span>
+      </div>
+      <div class="receipt__row">
+        <span class="receipt__label">门店</span>
+        <span class="receipt__store">地铁站店</span>
+      </div>
+
+      <div class="receipt__divider"></div>
+
+      <div class="receipt__item-row">
+        <span class="receipt__item-no">01</span>
+        <span class="receipt__item-name">珍珠奶茶</span>
+        <span class="receipt__item-price">¥12.00</span>
+      </div>
+      <div class="receipt__specs">大杯 · 正常冰 · 全糖</div>
+      <div class="receipt__specs">+ 椰果</div>
+
+      <div class="receipt__divider"></div>
+
+      <div class="receipt__row">
+        <span class="receipt__label">评分</span>
+        <span class="receipt__stars">★★★☆☆</span>
+      </div>
+      <div class="receipt__row">
+        <span class="receipt__label">合计</span>
+        <span class="receipt__item-price">¥ 12.00</span>
+      </div>
+
+      <div class="receipt__divider"></div>
+
+      <div class="receipt__mood-row">
+        <span class="receipt__mood-label">心情</span>
+        <div class="receipt__mood-content">
+          <span class="receipt__mood-text">"经典就是经典"</span>
+          <button class="receipt__voice-btn" title="播放心情语音"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button>
+        </div>
+      </div>
+
+      <div class="receipt__divider--dots" style="margin:5px 0;"></div>
+
+      <div class="receipt__footer">打印时间 2026-06-27 09:30:00</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

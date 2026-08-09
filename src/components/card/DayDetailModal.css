@@ -1,0 +1,264 @@
+/* ═══════════════════════════════════════════════════
+   DayDetailModal — 居中弹窗，适配小票大小，无滚动
+   ═══════════════════════════════════════════════════ */
+
+.day-detail-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(47, 31, 18, 0.35);
+  z-index: 300;
+  animation: fade-in var(--duration-normal) var(--ease-out);
+}
+
+.day-detail-modal__backdrop--closing {
+  animation: fade-in var(--duration-normal) var(--ease-in) reverse forwards;
+}
+
+.day-detail-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(360px, 88vw);
+  max-height: 82vh;
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  z-index: 301;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 12px 48px rgba(47, 31, 18, 0.25), 0 0 0 1px rgba(47, 31, 18, 0.06);
+  animation: modal-enter 250ms var(--ease-bounce);
+}
+
+@keyframes modal-enter {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.day-detail-modal--closing {
+  animation: modal-exit var(--duration-fast) var(--ease-in) forwards;
+}
+
+@keyframes modal-exit {
+  from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  to   { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
+}
+
+/* ═══════════════════════ Header ═══════════════════════ */
+
+.day-detail-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-3) var(--spacing-4);
+  border-bottom: 1px solid var(--color-divider);
+  flex-shrink: 0;
+}
+
+.day-detail-modal__title {
+  font-family: var(--font-family-display);
+  font-size: var(--text-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.day-detail-modal__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-default);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.day-detail-modal__close:hover {
+  background: var(--color-tea-100);
+}
+
+/* ═══════════════════════ Body ═══════════════════════ */
+
+.day-detail-modal__body {
+  overflow: hidden;
+  padding: var(--spacing-3) var(--spacing-4);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-shrink: 1;
+}
+
+.day-detail-modal__receipt-wrapper {
+  width: 100%;
+}
+
+/* ═══════════════════════ Carousel 轮播 ═══════════════════════ */
+
+.day-detail-modal__carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  gap: var(--spacing-4);
+  /* 隐藏滚动条 */
+  scrollbar-width: none;
+}
+
+.day-detail-modal__carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.day-detail-modal__carousel-page {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+
+.day-detail-modal__dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-2);
+  padding-top: var(--spacing-2);
+}
+
+.day-detail-modal__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--color-tea-300);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-default);
+  padding: 0;
+}
+
+.day-detail-modal__dot--active {
+  background: var(--color-accent);
+  width: 20px;
+  border-radius: 4px;
+}
+
+/* ═══════════════════════ Hint 未来日期简化提示 ═══════════════════════ */
+
+.day-detail-modal__body--hint {
+  align-items: center;
+  justify-content: center;
+  padding-top: var(--spacing-8);
+  padding-bottom: var(--spacing-8);
+}
+
+.day-detail-modal__hint-text {
+  font-family: var(--font-family-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-hint);
+  margin: 0;
+}
+
+/* ═══════════════════════ Empty 空态 ═══════════════════════ */
+
+.day-detail-modal__body--empty {
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-3);
+  padding-top: var(--spacing-8);
+  padding-bottom: var(--spacing-8);
+}
+
+.day-detail-modal__empty-icon {
+  font-size: 48px;
+  opacity: 0.6;
+}
+
+.day-detail-modal__empty-text {
+  font-family: var(--font-family-display);
+  font-size: var(--text-md);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.day-detail-modal__empty-hint {
+  font-family: var(--font-family-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-hint);
+  margin: 0;
+}
+
+.day-detail-modal__upload-actions {
+  display: flex;
+  gap: var(--spacing-4);
+  margin-top: var(--spacing-4);
+}
+
+.day-detail-modal__upload-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-5) var(--spacing-6);
+  border: 1.5px dashed var(--color-tea-300);
+  border-radius: var(--radius-lg);
+  background: var(--color-tea-50);
+  color: var(--color-tea-600);
+  font-family: var(--font-family-body);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-default),
+              border-color var(--duration-fast) var(--ease-default);
+  -webkit-tap-highlight-color: transparent;
+  min-width: 100px;
+}
+
+.day-detail-modal__upload-btn:hover {
+  background: var(--color-tea-100);
+  border-color: var(--color-tea-400);
+}
+
+.day-detail-modal__upload-btn:active {
+  background: var(--color-tea-200);
+}
+
+/* ═══════════════════════ Actions ═══════════════════════ */
+
+.day-detail-modal__actions {
+  display: flex;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+  padding-bottom: calc(var(--spacing-3) + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--color-divider);
+  flex-shrink: 0;
+}
+
+.day-detail-modal__btn {
+  flex: 1;
+  padding: var(--spacing-3);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-family-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+  cursor: pointer;
+  transition: opacity var(--duration-fast) var(--ease-default);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.day-detail-modal__btn:active {
+  opacity: 0.8;
+}
+
+.day-detail-modal__btn--edit {
+  background: var(--color-tea-100);
+  color: var(--color-tea-700);
+}
+
+.day-detail-modal__btn--delete {
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+}

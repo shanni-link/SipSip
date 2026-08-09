@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>月份栏对齐调参器</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tea-50:  #fbf5ed;
+    --tea-500: #8b6b4a;
+    --tea-600: #6b4f34;
+    --tea-800: #2f1f12;
+    --surface: #fffdf7;
+    --divider: #ede0cf;
+    --border: #e0cfb5;
+    --accent: #c94a3a;
+    --text-primary: #2f1f12;
+    --text-secondary: #6b4f34;
+    --text-hint: #b8946e;
+    --font-display: 'Noto Serif SC', serif;
+    --font-body: 'Zen Kaku Gothic New', 'PingFang SC', sans-serif;
+    --radius-md: 8px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    background: #f0ebe0;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ═══ 左侧预览 ═══ */
+  .preview {
+    flex: 1;
+    min-width: 400px;
+    max-width: 540px;
+    padding: 40px 0;
+    background: #f5efe5;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .phone-frame {
+    max-width: 500px;
+    margin: 0 auto;
+    background: var(--surface);
+    min-height: 300px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    height: 48px;
+    padding: 0 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--divider);
+  }
+  .header__side {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .header__side--right {
+    justify-content: flex-end;
+  }
+  .header__title {
+    flex: 1;
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  /* Month bar */
+  .month-bar {
+    display: flex;
+    align-items: center;
+    background: var(--surface);
+    border-bottom: 1px solid var(--divider);
+  }
+  .month-bar .date-block {
+    flex: 1;
+    text-align: center;
+    white-space: nowrap;
+    /* offset tuned by JS */;
+  }
+  .month-bar .date-text {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .month-bar .btn-month {
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: var(--tea-50);
+    border: 1px solid var(--divider);
+    border-radius: var(--radius-md);
+    padding: 4px 10px;
+    cursor: pointer;
+    vertical-align: middle;
+    margin-left: 8px;
+  }
+  .month-bar .arrow-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  /* 对齐参考线 */
+  .align-guide {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--accent);
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0.6;
+  }
+  .align-guide::before {
+    content: '标题中心';
+    position: absolute;
+    top: 6px;
+    left: 4px;
+    font-size: 9px;
+    color: var(--accent);
+    white-space: nowrap;
+    font-weight: 700;
+  }
+
+  /* ═══ 右侧控制 ═══ */
+  .controls {
+    width: 360px;
+    padding: 20px;
+    background: #fffdf7;
+    border-left: 1px solid var(--divider);
+    box-shadow: -2px 0 16px rgba(0,0,0,0.04);
+    overflow-y: auto;
+    max-height: 100vh;
+  }
+  .controls h3 {
+    font-family: var(--font-display);
+    font-size: 18px;
+    color: var(--tea-800);
+  }
+  .controls .subtitle {
+    font-size: 11px;
+    color: var(--text-hint);
+    margin: 4px 0 16px;
+  }
+  .param-group {
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    background: var(--tea-50);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--divider);
+  }
+  .param-group h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--tea-700);
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .param-group h4 .val {
+    font-family: monospace;
+    font-size: 13px;
+    color: var(--accent);
+    background: #fff;
+    padding: 0 6px;
+    border-radius: 4px;
+    border: 1px solid var(--divider);
+  }
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .slider-row label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    min-width: 58px;
+    flex-shrink: 0;
+  }
+  .slider-row input[type="range"] {
+    flex: 1;
+    accent-color: var(--accent);
+  }
+  .slider-row .cur {
+    font-family: monospace;
+    font-size: 11px;
+    color: var(--tea-600);
+    min-width: 34px;
+    text-align: right;
+  }
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .btn-row button {
+    flex: 1;
+    padding: 10px 0;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    border: none;
+  }
+  .btn-copy {
+    background: var(--tea-500);
+    color: #fff;
+  }
+  .btn-copy:hover { background: var(--tea-600); }
+  .btn-reset {
+    background: #fff;
+    color: var(--accent);
+    border: 1.5px solid var(--accent) !important;
+  }
+
+  .info-box {
+    margin-top: 16px;
+    padding: 10px 12px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-family: monospace;
+    white-space: pre-wrap;
+  }
+
+  .copied-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--tea-800);
+    color: #fff;
+    padding: 8px 24px;
+    border-radius: 20px;
+    font-size: 13px;
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms;
+  }
+  .copied-toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="preview" id="preview">
+  <div class="phone-frame">
+    <!-- Header -->
+    <div class="header">
+      <div class="header__side" style="width:72px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      </div>
+      <h1 class="header__title" id="headerTitle">小票存根</h1>
+      <div class="header__side header__side--right" style="width:72px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+      </div>
+    </div>
+
+    <!-- Month Bar -->
+    <div class="month-bar" id="monthBar" style="padding-top:12px;padding-bottom:12px;">
+      <div class="header__side" id="leftSide" style="width:72px; padding-left:16px;">
+        <button class="arrow-btn">&lt;</button>
+      </div>
+      <div class="date-block" id="dateBlock">
+        <span class="date-text">2026年6月</span>
+        <button class="btn-month" style="visibility:visible;">本月</button>
+      </div>
+      <div class="header__side header__side--right" id="rightSide" style="width:72px; padding-right:16px;">
+        <button class="arrow-btn">&gt;</button>
+      </div>
+    </div>
+
+    <!-- 列表占位 -->
+    <div style="padding:40px;text-align:center;color:var(--text-hint);">📋 列表内容</div>
+  </div>
+
+  <!-- 对齐参考线 -->
+  <div class="align-guide" id="guide" style="left:200px;"></div>
+</div>
+
+<div class="controls">
+  <h3>🎚️ 对齐调参器</h3>
+  <p class="subtitle">拖动滑杆 → 上方实时预览。<br>红色竖线标记"小票存根"标题中心点。</p>
+
+  <div class="param-group">
+    <h4>📍 日期水平偏移 <span class="val" id="valX">0px</span></h4>
+    <div class="slider-row">
+      <label>translateX</label>
+      <input type="range" id="slX" min="-80" max="80" value="0" step="1" oninput="update()">
+      <span class="cur" id="curX">0px</span>
+    </div>
+    <p style="font-size:10px;color:var(--text-hint);margin-top:4px;">正值→右移，负值→左移</p>
+  </div>
+
+  <div class="param-group">
+    <h4>📐 左栏宽度 <span class="val" id="valLW">72px</span></h4>
+    <div class="slider-row">
+      <label>left-w</label>
+      <input type="range" id="slLW" min="32" max="120" value="72" step="1" oninput="update()">
+      <span class="cur" id="curLW">72px</span>
+    </div>
+  </div>
+
+  <div class="param-group">
+    <h4>📐 右栏宽度 <span class="val" id="valRW">72px</span></h4>
+    <div class="slider-row">
+      <label>right-w</label>
+      <input type="range" id="slRW" min="32" max="120" value="72" step="1" oninput="update()">
+      <span class="cur" id="curRW">72px</span>
+    </div>
+  </div>
+
+  <div class="param-group">
+    <h4>📏 容器左右 padding <span class="val" id="valPad">16px</span></h4>
+    <div class="slider-row">
+      <label>pad-x</label>
+      <input type="range" id="slPad" min="0" max="40" value="16" step="1" oninput="update()">
+      <span class="cur" id="curPad">16px</span>
+    </div>
+  </div>
+
+  <div class="param-group">
+    <h4>📏 左栏内 padding <span class="val" id="valLp">16px</span></h4>
+    <div class="slider-row">
+      <label>left-pad</label>
+      <input type="range" id="slLp" min="0" max="40" value="16" step="1" oninput="update()">
+      <span class="cur" id="curLp">16px</span>
+    </div>
+  </div>
+
+  <div class="param-group">
+    <h4>📏 右栏内 padding <span class="val" id="valRp">16px</span></h4>
+    <div class="slider-row">
+      <label>right-pad</label>
+      <input type="range" id="slRp" min="0" max="40" value="16" step="1" oninput="update()">
+      <span class="cur" id="curRp">16px</span>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn-reset" onclick="resetAll()">↺ 重置</button>
+    <button class="btn-copy" onclick="copyValues()">📋 复制参数</button>
+  </div>
+
+  <div class="info-box" id="infoBox">拖动滑杆直到红色竖线穿过日期文字中心…</div>
+</div>
+
+<div class="copied-toast" id="toast">✅ 已复制</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+
+  function update() {
+    const x    = parseInt($('slX').value);
+    const lw   = parseInt($('slLW').value);
+    const rw   = parseInt($('slRW').value);
+    const pad  = parseInt($('slPad').value);
+    const lp   = parseInt($('slLp').value);
+    const rp   = parseInt($('slRp').value);
+
+    // Apply to month bar
+    $('monthBar').style.paddingLeft  = pad + 'px';
+    $('monthBar').style.paddingRight = pad + 'px';
+    $('leftSide').style.width  = lw + 'px';
+    $('leftSide').style.paddingLeft  = lp + 'px';
+    $('rightSide').style.width = rw + 'px';
+    $('rightSide').style.paddingRight = rp + 'px';
+    $('dateBlock').style.transform = `translateX(${x}px)`;
+
+    // Update displayed values
+    $('valX').textContent  = x + 'px';   $('curX').textContent  = x + 'px';
+    $('valLW').textContent = lw + 'px';  $('curLW').textContent = lw + 'px';
+    $('valRW').textContent = rw + 'px';  $('curRW').textContent = rw + 'px';
+    $('valPad').textContent = pad + 'px'; $('curPad').textContent = pad + 'px';
+    $('valLp').textContent = lp + 'px';  $('curLp').textContent = lp + 'px';
+    $('valRp').textContent = rp + 'px';  $('curRp').textContent = rp + 'px';
+
+    // Update guide line position
+    updateGuide();
+  }
+
+  function updateGuide() {
+    // Calculate the center of the header title
+    const phoneFrame = document.querySelector('.phone-frame');
+    const headerTitle = $('headerTitle');
+    const frameRect = phoneFrame.getBoundingClientRect();
+    const titleRect = headerTitle.getBoundingClientRect();
+    const titleCenter = titleRect.left + titleRect.width / 2 - frameRect.left;
+
+    const guide = $('guide');
+    guide.style.left = titleCenter + 'px';
+  }
+
+  function resetAll() {
+    $('slX').value = 0;
+    $('slLW').value = 72;
+    $('slRW').value = 72;
+    $('slPad').value = 16;
+    $('slLp').value = 16;
+    $('slRp').value = 16;
+    update();
+  }
+
+  function copyValues() {
+    const x   = parseInt($('slX').value);
+    const lw  = parseInt($('slLW').value);
+    const rw  = parseInt($('slRW').value);
+    const pad = parseInt($('slPad').value);
+    const lp  = parseInt($('slLp').value);
+    const rp  = parseInt($('slRp').value);
+
+    const text = `/* 月份栏对齐参数 */
+dateOffsetX: ${x}px
+leftSideWidth: ${lw}px
+rightSideWidth: ${rw}px
+containerPadX: ${pad}px
+leftSidePadLeft: ${lp}px
+rightSidePadRight: ${rp}px`;
+
+    navigator.clipboard.writeText(text).then(() => {
+      const toast = $('toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1500);
+    });
+
+    $('infoBox').textContent = text;
+  }
+
+  // Init
+  update();
+
+  // Recalculate guide on resize
+  window.addEventListener('resize', updateGuide);
+
+  // Update guide after fonts load
+  document.fonts.ready.then(updateGuide);
+  setTimeout(updateGuide, 500);
+  setTimeout(updateGuide, 1500);
+</script>
+
+</body>
+</html>

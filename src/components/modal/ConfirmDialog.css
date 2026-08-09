@@ -1,0 +1,144 @@
+/* ═══════════════════════════════════════════════════
+   ConfirmDialog — 居中确认弹窗
+   遮罩 + 缩放弹入 + 双按钮
+   ═══════════════════════════════════════════════════ */
+
+/* ── 遮罩 ── */
+
+.confirm-dialog__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(47, 31, 18, 0.3);
+  z-index: 500;
+  animation: fade-in var(--duration-normal) var(--ease-out);
+}
+
+.confirm-dialog__backdrop--closing {
+  animation: fade-in var(--duration-fast) var(--ease-in) reverse forwards;
+}
+
+/* ── 对话框 ── */
+
+.confirm-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100% - var(--spacing-8) * 2);
+  max-width: 320px;
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  z-index: 501;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-6);
+  gap: var(--spacing-4);
+  box-shadow: var(--shadow-lg);
+  animation: confirm-dialog-in var(--duration-normal) var(--ease-bounce);
+}
+
+.confirm-dialog--closing {
+  animation: confirm-dialog-out var(--duration-fast) var(--ease-in) forwards;
+}
+
+/* ── 弹入/弹出动画 ── */
+
+@keyframes confirm-dialog-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes confirm-dialog-out {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+
+/* ── 标题 ── */
+
+.confirm-dialog__title {
+  font-family: var(--font-family-display);
+  font-size: var(--text-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+  text-align: center;
+}
+
+/* ── 正文 ── */
+
+.confirm-dialog__message {
+  font-family: var(--font-family-body);
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  margin: 0;
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* ── 按钮组 ── */
+
+.confirm-dialog__actions {
+  display: flex;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-2);
+}
+
+.confirm-dialog__btn {
+  flex: 1;
+  padding: var(--spacing-3);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-family-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+  cursor: pointer;
+  transition: opacity var(--duration-fast) var(--ease-default);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.confirm-dialog__btn:active {
+  opacity: 0.8;
+}
+
+/* 取消按钮 */
+.confirm-dialog__btn--cancel {
+  background: var(--color-tea-100);
+  color: var(--color-tea-700);
+}
+
+.confirm-dialog__btn--cancel:hover {
+  background: var(--color-tea-200);
+}
+
+/* 确认按钮（默认） */
+.confirm-dialog__btn--confirm {
+  background: var(--color-tea-500);
+  color: var(--color-text-inverse);
+}
+
+.confirm-dialog__btn--confirm:hover {
+  background: var(--color-tea-600);
+}
+
+/* 确认按钮（危险） */
+.confirm-dialog__btn--danger {
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+}
+
+.confirm-dialog__btn--danger:hover {
+  background: var(--color-accent-dark);
+}

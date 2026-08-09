@@ -1,0 +1,24 @@
+/* ═══════════════════════════════════════════════════
+   ListPage — 小票存根列表页
+   响应式微调：手机端防止月份栏元素重叠
+   ═══════════════════════════════════════════════════ */
+
+/* 月份文字：窄屏缩小 */
+.list-month-label {
+  font-family: var(--font-family-display);
+  font-size: var(--text-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  user-select: none;
+}
+
+@media (max-width: 380px) {
+  .list-month-label {
+    font-size: var(--text-sm);
+  }
+
+  .list-month-today-btn {
+    padding: 3px 7px;
+    font-size: 11px;
+  }
+}

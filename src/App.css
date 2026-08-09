@@ -1,0 +1,8 @@
+/* 奶茶记录仪 — App 层样式 */
+
+.app-container {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}

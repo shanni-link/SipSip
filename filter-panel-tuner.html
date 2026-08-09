@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FilterPanel 调参台</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Ma+Shan+Zheng&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tea-50:  #fbf5ed;
+    --tea-100: #f5e6d3;
+    --tea-200: #ebd3b0;
+    --tea-300: #d4b68a;
+    --tea-400: #b8946e;
+    --tea-500: #8b6b4a;
+    --tea-600: #6b4f34;
+    --tea-700: #4d3724;
+    --tea-800: #2f1f12;
+    --tea-900: #1a0f06;
+    --accent:       #c94a3a;
+    --accent-light: #e57363;
+    --accent-dark:  #9e3527;
+    --surface:      #fffdf7;
+    --border:       #e0cfb5;
+    --divider:      #ede0cf;
+    --text-primary:   #2f1f12;
+    --text-secondary: #6b4f34;
+    --text-hint:      #b8946e;
+    --font-display: 'Noto Serif SC', 'Source Han Serif SC', 'STSong', serif;
+    --font-body:    'Zen Kaku Gothic New', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    --font-stamp:   'Ma Shan Zheng', 'ZCOOL QingKe HuangYou', cursive;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --shadow-md: 0 4px 16px rgba(47,31,18,0.10);
+    --shadow-lg: 0 8px 30px rgba(47,31,18,0.14);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    background: #f0ebe0;
+    color: var(--text-primary);
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ═══ 左侧预览区 ═══ */
+  .preview-panel {
+    flex: 1;
+    min-width: 380px;
+    max-width: 500px;
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    background: #f5efe5;
+    border-right: 1px solid var(--divider);
+    overflow-y: auto;
+    max-height: 100vh;
+  }
+
+  .preview-panel h2 {
+    font-family: var(--font-display);
+    font-size: 17px;
+    color: var(--tea-600);
+    margin-bottom: 2px;
+  }
+  .preview-panel .section-label {
+    font-size: 11px;
+    color: var(--text-hint);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* 月份栏 */
+  .month-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--divider);
+    background: var(--surface);
+    gap: 8px;
+    border-radius: var(--radius-md);
+  }
+  .month-bar .arrow {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border: none; background: transparent;
+    flex-shrink: 0;
+    font-size: 16px;
+  }
+  .month-bar .date-label {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-primary);
+    user-select: none;
+    flex-shrink: 0;
+  }
+  .month-bar .btn-this-month {
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: var(--tea-50);
+    border: 1px solid var(--divider);
+    border-radius: var(--radius-md);
+    padding: 4px 10px;
+    cursor: pointer;
+    line-height: 1.4;
+    white-space: nowrap;
+    margin-left: 4px;
+  }
+
+  /* ═══ FilterPanel ═══ */
+  .filter-panel {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    box-shadow: var(--shadow-md);
+    /* Tunable params injected by JS */
+  }
+
+  .fp-group {
+    /* margin-bottom tuned by JS */;
+  }
+  .fp-group:first-child { padding-top: 0; }
+
+  .fp-group-title {
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    /* margin-bottom tuned by JS */
+  }
+
+  .fp-chips {
+    display: flex;
+    flex-wrap: wrap;
+    /* gap tuned by JS */
+  }
+
+  .fp-chip {
+    /* padding tuned by JS */
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 150ms ease;
+    user-select: none;
+    line-height: 1.5;
+  }
+  .fp-chip:hover { border-color: var(--tea-400); background: var(--tea-50); }
+  .fp-chip:active { transform: scale(0.96); }
+  .fp-chip.active { color: #fff; }
+
+  .fp-date-display {
+    display: flex; align-items: center; gap: 2px;
+  }
+  .fp-date-part {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-primary);
+    background: var(--tea-50);
+    border: 1.5px solid var(--divider);
+    border-radius: var(--radius-md);
+    padding: 5px 10px;
+    cursor: pointer;
+    line-height: 1.5;
+  }
+
+  .fp-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    /* margin-top + padding-top tuned by JS */
+  }
+
+  .fp-btn {
+    height: 36px;
+    /* padding-x, letter-spacing, min-width tuned by JS */
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 150ms ease;
+    white-space: nowrap;
+    border: none;
+    text-align: center;
+  }
+  .fp-btn:active { transform: scale(0.97); }
+  .fp-btn--secondary {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--text-primary);
+  }
+  .fp-btn--primary {
+    background: var(--tea-500);
+    color: #fff;
+  }
+  .fp-btn--reset {
+    color: var(--text-secondary);
+    background: var(--tea-50);
+    border: 1px solid var(--divider);
+  }
+
+  /* 网格参考线（调试用） */
+  .debug-grid .fp-chip       { outline: 1px dashed rgba(255,0,0,0.25); }
+  .debug-grid .fp-group      { outline: 1px dashed rgba(0,0,255,0.2); }
+  .debug-grid .fp-group-title{ outline: 1px dashed rgba(0,128,0,0.25); }
+  .debug-grid .fp-actions    { outline: 1px dashed rgba(255,165,0,0.4); }
+
+  /* ═══ 右侧控制面板 ═══ */
+  .control-panel {
+    width: 380px;
+    padding: 20px;
+    background: #fffdf7;
+    overflow-y: auto;
+    max-height: 100vh;
+    border-left: 1px solid var(--divider);
+    box-shadow: -2px 0 16px rgba(0,0,0,0.04);
+  }
+
+  .control-panel h3 {
+    font-family: var(--font-display);
+    font-size: 18px;
+    color: var(--tea-800);
+    margin-bottom: 4px;
+  }
+  .control-panel .subtitle {
+    font-size: 11px;
+    color: var(--text-hint);
+    margin-bottom: 20px;
+  }
+
+  .param-group {
+    margin-bottom: 18px;
+    padding: 12px 14px;
+    background: var(--tea-50);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--divider);
+  }
+  .param-group h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--tea-700);
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .param-group h4 .val {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    background: #fff;
+    padding: 1px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--divider);
+  }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .slider-row:last-child { margin-bottom: 0; }
+  .slider-row label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    min-width: 70px;
+    flex-shrink: 0;
+  }
+  .slider-row input[type="range"] {
+    flex: 1;
+    accent-color: var(--accent);
+    height: 6px;
+  }
+  .slider-row .cur {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--tea-600);
+    min-width: 36px;
+    text-align: right;
+  }
+
+  .quick-presets {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .quick-presets button {
+    font-family: var(--font-body);
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: #fff;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 120ms ease;
+  }
+  .quick-presets button:hover { background: var(--tea-100); color: var(--text-primary); }
+  .quick-presets button.active-preset { background: var(--tea-500); color: #fff; border-color: var(--tea-500); }
+
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .btn-row button {
+    flex: 1;
+    padding: 10px 0;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    border: none;
+    transition: all 120ms ease;
+  }
+  .btn-copy {
+    background: var(--tea-500);
+    color: #fff;
+  }
+  .btn-copy:hover { background: var(--tea-600); }
+  .btn-copy:active { transform: scale(0.97); }
+  .btn-reset-sliders {
+    background: #fff;
+    color: var(--accent);
+    border: 1.5px solid var(--accent) !important;
+  }
+  .btn-reset-sliders:hover { background: rgba(201,74,58,0.06); }
+
+  .copied-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--tea-800);
+    color: #fff;
+    padding: 8px 24px;
+    border-radius: 20px;
+    font-size: 13px;
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease;
+  }
+  .copied-toast.show { opacity: 1; }
+
+  .debug-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 8px 0 12px;
+    font-size: 11px;
+    color: var(--text-hint);
+    cursor: pointer;
+    user-select: none;
+  }
+  .debug-toggle input { accent-color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ 左侧预览 ═══════════════ -->
+<div class="preview-panel" id="previewPanel">
+
+  <div>
+    <div class="section-label">列表页 · 月份切换栏</div>
+    <h2 style="margin-top:2px;">月份栏 ← 日期固定 →</h2>
+    <div class="month-bar">
+      <button class="arrow">&lt;</button>
+      <span style="display:flex;align-items:center;gap:12px;flex:1;justify-content:center;">
+        <span class="date-label">2026年6月</span>
+        <button class="btn-this-month" id="thisMonthBtn" style="visibility:hidden;">本月</button>
+      </span>
+      <button class="arrow">&gt;</button>
+    </div>
+    <p style="font-size:10px;color:var(--text-hint);margin-top:6px;">💡 切换月份看「本月」按钮是否跳动 — 当前月隐藏但占位</p>
+    <div style="margin-top:6px;display:flex;gap:6px;">
+      <button onclick="toggleMonth()" style="font-size:11px;padding:3px 10px;border:1px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;">切换月份</button>
+      <span style="font-size:11px;color:var(--text-secondary);align-self:center;" id="monthStatus">当前：2026年6月（本月隐藏）</span>
+    </div>
+  </div>
+
+  <div>
+    <div class="section-label">筛选面板</div>
+    <h2 style="margin-top:2px;">FilterPanel</h2>
+
+    <div class="filter-panel" id="filterPanel">
+      <!-- 日期 -->
+      <div class="fp-group" id="fpGroupDate">
+        <h3 class="fp-group-title">日期</h3>
+        <div class="fp-date-display">
+          <button class="fp-date-part">2026年6月−</button>
+        </div>
+      </div>
+
+      <!-- 品牌 -->
+      <div class="fp-group" id="fpGroupBrand">
+        <h3 class="fp-group-title">品牌</h3>
+        <div class="fp-chips">
+          <button class="fp-chip" style="background:#1a1a1a;color:#fff;border-color:#1a1a1a;">喜茶</button>
+          <button class="fp-chip" style="background:#2d5a27;color:#fff;border-color:#2d5a27;">奈雪</button>
+          <button class="fp-chip">蜜雪冰城</button>
+          <button class="fp-chip" style="background:#1a5276;color:#fff;border-color:#1a5276;">茶百道</button>
+          <button class="fp-chip">霸王茶姬</button>
+          <button class="fp-chip">其他</button>
+        </div>
+      </div>
+
+      <!-- 评分 -->
+      <div class="fp-group" id="fpGroupRating">
+        <h3 class="fp-group-title">评分</h3>
+        <div class="fp-chips">
+          <button class="fp-chip active" style="background:var(--accent);border-color:var(--accent);">1分</button>
+          <button class="fp-chip">2分</button>
+          <button class="fp-chip">3分</button>
+          <button class="fp-chip">4分</button>
+          <button class="fp-chip">5分</button>
+        </div>
+      </div>
+
+      <!-- 按钮行 -->
+      <div class="fp-actions" id="fpActions">
+        <button class="fp-btn fp-btn--reset">清除</button>
+        <div style="flex:1;"></div>
+        <button class="fp-btn fp-btn--secondary">取消</button>
+        <button class="fp-btn fp-btn--primary">应用</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ 右侧控制面板 ═══════════════ -->
+<div class="control-panel">
+  <h3>🎚️ 调参台</h3>
+  <p class="subtitle">拖动滑杆 → 左侧实时预览</p>
+
+  <div class="quick-presets">
+    <button onclick="applyPreset('v5')" id="presetV5">v5 原始</button>
+    <button onclick="applyPreset('v7')" id="presetV7">v7 当前</button>
+    <button onclick="applyPreset('wide')" id="presetWide">宽松版</button>
+  </div>
+
+  <div class="debug-toggle" onclick="toggleDebug()">
+    <input type="checkbox" id="debugCheck"> 显示间距参考线
+  </div>
+
+  <!-- 行间距 -->
+  <div class="param-group">
+    <h4>📏 行与行间距（分组底部）<span class="val" id="valGroupMb">48px</span></h4>
+    <div class="slider-row">
+      <label>group-mb</label>
+      <input type="range" id="slGroupMb" min="0" max="80" value="48" oninput="updateParam('groupMb', this.value)">
+      <span class="cur" id="curGroupMb">48px</span>
+    </div>
+  </div>
+
+  <!-- 标题到内容 -->
+  <div class="param-group">
+    <h4>📏 标题 → 内容间距<span class="val" id="valTitleMb">16px</span></h4>
+    <div class="slider-row">
+      <label>title-mb</label>
+      <input type="range" id="slTitleMb" min="0" max="40" value="16" oninput="updateParam('titleMb', this.value)">
+      <span class="cur" id="curTitleMb">16px</span>
+    </div>
+  </div>
+
+  <!-- Chip 间距 -->
+  <div class="param-group">
+    <h4>📏 框与框间距（chip gap）<span class="val" id="valChipGap">20px</span></h4>
+    <div class="slider-row">
+      <label>chip-gap</label>
+      <input type="range" id="slChipGap" min="0" max="48" value="20" oninput="updateParam('chipGap', this.value)">
+      <span class="cur" id="curChipGap">20px</span>
+    </div>
+  </div>
+
+  <!-- Chip 内边距 -->
+  <div class="param-group">
+    <h4>📏 框内边距（chip padding）<span class="val" id="valChipPad">5px 14px</span></h4>
+    <div class="slider-row">
+      <label>chip-py</label>
+      <input type="range" id="slChipPy" min="1" max="16" value="5" oninput="updateParam('chipPy', this.value)">
+      <span class="cur" id="curChipPy">5px</span>
+    </div>
+    <div class="slider-row">
+      <label>chip-px</label>
+      <input type="range" id="slChipPx" min="4" max="32" value="14" oninput="updateParam('chipPx', this.value)">
+      <span class="cur" id="curChipPx">14px</span>
+    </div>
+  </div>
+
+  <!-- 按钮行到上方 -->
+  <div class="param-group">
+    <h4>📏 按钮行 → 上方间距<span class="val" id="valActionsSpace">60px</span></h4>
+    <div class="slider-row">
+      <label>actions-mt</label>
+      <input type="range" id="slActionsMt" min="0" max="80" value="48" oninput="updateParam('actionsMt', this.value)">
+      <span class="cur" id="curActionsMt">48px</span>
+    </div>
+    <div class="slider-row">
+      <label>actions-pt</label>
+      <input type="range" id="slActionsPt" min="0" max="40" value="12" oninput="updateParam('actionsPt', this.value)">
+      <span class="cur" id="curActionsPt">12px</span>
+    </div>
+  </div>
+
+  <!-- 按钮尺寸 -->
+  <div class="param-group">
+    <h4>📏 按钮宽度 & 字距<span class="val" id="valBtnW">~58px</span></h4>
+    <div class="slider-row">
+      <label>btn-px</label>
+      <input type="range" id="slBtnPx" min="4" max="40" value="16" oninput="updateParam('btnPx', this.value)">
+      <span class="cur" id="curBtnPx">16px</span>
+    </div>
+    <div class="slider-row">
+      <label>letter-spacing</label>
+      <input type="range" id="slBtnLetter" min="0" max="2" step="0.05" value="0.5" oninput="updateParam('btnLetter', this.value)">
+      <span class="cur" id="curBtnLetter">0.5em</span>
+    </div>
+    <div class="slider-row">
+      <label>min-width</label>
+      <input type="range" id="slBtnMinW" min="24" max="100" value="52" oninput="updateParam('btnMinW', this.value)">
+      <span class="cur" id="curBtnMinW">52px</span>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn-reset-sliders" onclick="resetToDefault()">↺ 恢复默认</button>
+    <button class="btn-copy" onclick="copyValues()">📋 复制 CSS 值</button>
+  </div>
+
+  <div style="margin-top:12px;font-size:10px;color:var(--text-hint);text-align:center;" id="copyFeedback"></div>
+</div>
+
+<div class="copied-toast" id="toast">✅ CSS 值已复制到剪贴板</div>
+
+<script>
+  // ═══ 参数状态 ═══
+  const params = {
+    groupMb:  48,   // group margin-bottom
+    titleMb:  16,   // group-title margin-bottom
+    chipGap:  20,   // chips gap
+    chipPy:    5,   // chip padding-y
+    chipPx:   14,   // chip padding-x
+    actionsMt:48,   // actions margin-top
+    actionsPt:12,   // actions padding-top
+    btnPx:    16,   // button padding-x
+    btnLetter:0.5,  // button letter-spacing (em)
+    btnMinW:  52,   // button min-width (px)
+  };
+
+  const defaults = { ...params };
+
+  // ═══ 更新预览 ═══
+  function applyParams() {
+    // Group margin-bottom
+    document.querySelectorAll('.fp-group').forEach(el => {
+      el.style.marginBottom = params.groupMb + 'px';
+    });
+    document.getElementById('fpGroupRating').style.marginBottom = '0'; // 最后一组无底部间距
+
+    // Group title margin-bottom
+    document.querySelectorAll('.fp-group-title').forEach(el => {
+      el.style.marginBottom = params.titleMb + 'px';
+    });
+
+    // Chip gap
+    document.querySelectorAll('.fp-chips').forEach(el => {
+      el.style.gap = params.chipGap + 'px';
+    });
+
+    // Chip padding
+    document.querySelectorAll('.fp-chip').forEach(el => {
+      el.style.padding = params.chipPy + 'px ' + params.chipPx + 'px';
+    });
+
+    // Actions spacing
+    const actions = document.getElementById('fpActions');
+    actions.style.marginTop = params.actionsMt + 'px';
+    actions.style.paddingTop = params.actionsPt + 'px';
+
+    // Button styles
+    document.querySelectorAll('.fp-btn').forEach(el => {
+      el.style.paddingLeft = params.btnPx + 'px';
+      el.style.paddingRight = params.btnPx + 'px';
+      el.style.letterSpacing = params.btnLetter + 'em';
+      el.style.minWidth = params.btnMinW + 'px';
+    });
+
+    // Update displayed values
+    updateDisplayValues();
+  }
+
+  function updateDisplayValues() {
+    document.getElementById('valGroupMb').textContent = params.groupMb + 'px';
+    document.getElementById('curGroupMb').textContent = params.groupMb + 'px';
+    document.getElementById('valTitleMb').textContent = params.titleMb + 'px';
+    document.getElementById('curTitleMb').textContent = params.titleMb + 'px';
+    document.getElementById('valChipGap').textContent = params.chipGap + 'px';
+    document.getElementById('curChipGap').textContent = params.chipGap + 'px';
+    document.getElementById('valChipPad').textContent = params.chipPy + 'px ' + params.chipPx + 'px';
+    document.getElementById('curChipPy').textContent = params.chipPy + 'px';
+    document.getElementById('curChipPx').textContent = params.chipPx + 'px';
+    document.getElementById('valActionsSpace').textContent = (params.actionsMt + params.actionsPt) + 'px';
+    document.getElementById('curActionsMt').textContent = params.actionsMt + 'px';
+    document.getElementById('curActionsPt').textContent = params.actionsPt + 'px';
+    const btnW = Math.round(params.btnMinW);
+    document.getElementById('valBtnW').textContent = '~' + btnW + 'px';
+    document.getElementById('curBtnPx').textContent = params.btnPx + 'px';
+    document.getElementById('curBtnLetter').textContent = params.btnLetter + 'em';
+    document.getElementById('curBtnMinW').textContent = params.btnMinW + 'px';
+
+    // Sync sliders
+    document.getElementById('slGroupMb').value = params.groupMb;
+    document.getElementById('slTitleMb').value = params.titleMb;
+    document.getElementById('slChipGap').value = params.chipGap;
+    document.getElementById('slChipPy').value = params.chipPy;
+    document.getElementById('slChipPx').value = params.chipPx;
+    document.getElementById('slActionsMt').value = params.actionsMt;
+    document.getElementById('slActionsPt').value = params.actionsPt;
+    document.getElementById('slBtnPx').value = params.btnPx;
+    document.getElementById('slBtnLetter').value = params.btnLetter;
+    document.getElementById('slBtnMinW').value = params.btnMinW;
+  }
+
+  function updateParam(key, val) {
+    const num = key === 'btnLetter' ? parseFloat(val) : parseInt(val);
+    params[key] = num;
+    applyParams();
+  }
+
+  // ═══ 预设 ═══
+  const presets = {
+    v5: {
+      groupMb: 20, titleMb: 12, chipGap: 12, chipPy: 5, chipPx: 14,
+      actionsMt: 24, actionsPt: 0, btnPx: 20, btnLetter: 0, btnMinW: 0,
+    },
+    v7: {
+      groupMb: 48, titleMb: 16, chipGap: 20, chipPy: 5, chipPx: 14,
+      actionsMt: 48, actionsPt: 12, btnPx: 16, btnLetter: 0.5, btnMinW: 52,
+    },
+    wide: {
+      groupMb: 60, titleMb: 20, chipGap: 28, chipPy: 7, chipPx: 18,
+      actionsMt: 56, actionsPt: 16, btnPx: 22, btnLetter: 0.75, btnMinW: 64,
+    },
+  };
+
+  function applyPreset(name) {
+    Object.assign(params, presets[name]);
+    applyParams();
+    // Active state
+    document.querySelectorAll('.quick-presets button').forEach(b => b.classList.remove('active-preset'));
+    document.getElementById('preset' + name.charAt(0).toUpperCase() + name.slice(1)).classList.add('active-preset');
+  }
+
+  function resetToDefault() {
+    Object.assign(params, defaults);
+    applyParams();
+    document.querySelectorAll('.quick-presets button').forEach(b => b.classList.remove('active-preset'));
+  }
+
+  // ═══ 复制 CSS ═══
+  function copyValues() {
+    const css = `/* FilterPanel 调参结果 */
+.filter-panel__group {
+  margin-bottom: ${params.groupMb}px;
+}
+.filter-panel__group-title {
+  margin-bottom: ${params.titleMb}px;
+}
+.filter-panel__chips {
+  gap: ${params.chipGap}px;
+}
+.filter-panel__chip {
+  padding: ${params.chipPy}px ${params.chipPx}px;
+}
+.filter-panel__actions {
+  margin-top: ${params.actionsMt}px;
+  padding-top: ${params.actionsPt}px;
+}
+.filter-panel__btn {
+  padding: 0 ${params.btnPx}px;
+  letter-spacing: ${params.btnLetter}em;
+  min-width: ${params.btnMinW}px;
+}
+.filter-panel__btn--reset {
+  padding: 0 ${params.btnPx}px;
+  letter-spacing: ${params.btnLetter}em;
+  min-width: ${params.btnMinW}px;
+}`;
+
+    navigator.clipboard.writeText(css).then(() => {
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1800);
+      document.getElementById('copyFeedback').textContent = '✅ 已复制！粘贴到 FilterPanel.css 替换对应值';
+    });
+  }
+
+  // ═══ 调试参考线 ═══
+  function toggleDebug() {
+    document.getElementById('filterPanel').classList.toggle('debug-grid');
+  }
+
+  // ═══ 月份切换演示 ═══
+  let showMonth = true;
+  function toggleMonth() {
+    showMonth = !showMonth;
+    const btn = document.getElementById('thisMonthBtn');
+    const status = document.getElementById('monthStatus');
+    const dateLabel = document.querySelector('.date-label');
+
+    if (showMonth) {
+      dateLabel.textContent = '2026年6月';
+      btn.style.visibility = 'hidden';
+      status.textContent = '当前：2026年6月（本月隐藏 → 占位不动 ✓）';
+    } else {
+      dateLabel.textContent = '2026年2月';
+      btn.style.visibility = 'visible';
+      status.textContent = '当前：2026年2月（本月可见 → 日期位置没变 ✓）';
+    }
+  }
+
+  // ═══ Chip 点击交互 ═══
+  document.querySelectorAll('.fp-chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+      if (this.parentElement.parentElement.id === 'fpGroupBrand') {
+        // Toggle brand chips
+        if (this.style.background === 'transparent' || !this.style.background) {
+          this.classList.add('active');
+        } else {
+          this.classList.remove('active');
+          this.style.background = '';
+          this.style.color = '';
+          this.style.borderColor = '';
+        }
+        this.style.padding = params.chipPy + 'px ' + params.chipPx + 'px';
+      }
+    });
+  });
+
+  // ═══ 初始化 ═══
+  applyPreset('v7');
+</script>
+
+</body>
+</html>

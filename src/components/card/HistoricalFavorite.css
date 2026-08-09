@@ -1,0 +1,104 @@
+/* ═══════════════════════════════════════════════════
+   HistoricalFavorite — 本月最爱（单行）+ 查看详情
+   虚线缝线边框
+   ═══════════════════════════════════════════════════ */
+
+.historical-favorite {
+  /* outer wrapper for gap spacing in parent */
+}
+
+.historical-favorite__card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  border: 1.5px dashed var(--color-tea-300);
+  padding: var(--spacing-3) var(--spacing-4);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.historical-favorite__card--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+  border-color: var(--color-tea-200);
+  background: var(--color-tea-50);
+}
+
+.historical-favorite__empty-text {
+  font-family: var(--font-family-display);
+  font-size: var(--text-base);
+  color: var(--color-text-hint);
+  margin: 0;
+}
+
+/* ═══════════════════════ 顶行：标签左 + 抠图右 ═══════════════════════ */
+
+.historical-favorite__top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.historical-favorite__header {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.historical-favorite__header-text {
+  font-family: var(--font-family-display);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+/* ═══════════════════════ 照片墙 ═══════════════════════ */
+
+.historical-favorite__photo-wall {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+  padding-right: var(--spacing-1);
+}
+
+.historical-favorite__photo {
+  flex-shrink: 0;
+}
+
+/* 照片墙内抠图缩小，确保 5 张可完整可见 */
+.historical-favorite__photo .tea-thumb {
+  width: 56px;
+  height: 56px;
+}
+
+.historical-favorite__photo:not(:first-child) {
+  margin-left: -16px;
+}
+
+/* ═══════════════════════ 查看详情按钮 ═══════════════════════ */
+
+.historical-favorite__view-all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  width: 100%;
+  padding: var(--spacing-2) 0;
+  margin-top: var(--spacing-3);
+  border: none;
+  border-top: 1px solid var(--color-divider);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-body);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--ease-default);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.historical-favorite__view-all:hover {
+  color: var(--color-text-primary);
+}

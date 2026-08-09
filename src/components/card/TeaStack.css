@@ -1,0 +1,31 @@
+/* ═══════════════════════════════════════════════════
+   TeaStack — 多张缩略图交叠展示
+   底部图层先渲染，上层后渲染（z-index 递增）
+   ═══════════════════════════════════════════════════ */
+
+.tea-stack {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.tea-stack__thumb {
+  position: absolute;
+}
+
+/* +N 溢出标记 */
+.tea-stack__badge {
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: var(--radius-full);
+  background: var(--color-tea-500);
+  color: #fff;
+  font-family: var(--font-family-body);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: 14px;
+  text-align: center;
+  white-space: nowrap;
+  box-shadow: 0 0 0 1.5px #fff;
+  position: absolute;
+}

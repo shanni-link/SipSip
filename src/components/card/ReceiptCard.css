@@ -1,0 +1,558 @@
+/* ═══════════════════════════════════════════════════
+   ReceiptCard — 复古收据打印风
+   统一纸底 · 品牌字色 · 抠图置顶 · 3字体系统
+   ═══════════════════════════════════════════════════ */
+
+/* ── 字体 ── */
+.receipt-card {
+  --rc-serif: 'Noto Serif SC', 'SimSun', serif;
+  --rc-mono:  'Courier New', Courier, 'SimSun', monospace;
+  --rc-marker: 'Ma Shan Zheng', 'Noto Serif SC', cursive;
+}
+
+/* ── 卡片容器 ── */
+.receipt-card {
+  max-width: 380px;
+  width: 100%;
+  margin: 0 auto;
+  background: #fdfaf5;
+  padding: 6px 20px 12px;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.04),
+    0 2px 8px rgba(0,0,0,0.06);
+  font-family: var(--rc-mono);
+  font-size: 12.5px;
+  color: #2f1f12;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 纸张微纹理 */
+.receipt-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.04;
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.receipt-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.receipt-card:active {
+  transform: scale(0.98) !important;
+}
+
+/* ═══════════════════════ 顶部/底部毛边 ═══════════════════════ */
+
+.receipt-card__torn-edge {
+  display: block;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.receipt-card__torn-edge path {
+  fill: currentColor;
+}
+
+/* ── 收藏星标（右上角悬浮） ── */
+
+.receipt-card__fav-star {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: rgba(255, 253, 247, 0.85);
+  border-radius: 50%;
+  cursor: pointer;
+  color: #c9b896;
+  transition: color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  padding: 0;
+}
+
+.receipt-card__fav-star:hover {
+  color: #e8a838;
+  background: rgba(255, 253, 247, 1);
+  transform: scale(1.1);
+}
+
+.receipt-card__fav-star:active {
+  transform: scale(0.9);
+}
+
+.receipt-card__fav-star--active {
+  color: #e8a838;
+  background: rgba(255, 240, 200, 0.9);
+}
+
+.receipt-card__fav-star--active:hover {
+  color: #d4941a;
+}
+
+/* ── 抠图 — 顶部居中 ── */
+.receipt-card__cutout-top {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6px 0 10px;
+}
+
+.receipt-card__cutout-top img {
+  max-width: 170px;
+  max-height: 170px;
+  object-fit: contain;
+  display: block;
+  /* 4方向 1px 白描边 + 微弱发光（与 TeaThumb 统一） */
+  filter:
+    drop-shadow( 0   1px 0 rgba(255,255,255,0.82))
+    drop-shadow( 0  -1px 0 rgba(255,255,255,0.82))
+    drop-shadow( 1px  0  0 rgba(255,255,255,0.82))
+    drop-shadow(-1px  0  0 rgba(255,255,255,0.82))
+    drop-shadow( 0   0 1.2px rgba(255,255,255,0.55));
+}
+
+/* 空态占位 */
+.receipt-card__cutout-top--empty {
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #c9b896;
+}
+
+/* ── ASCII 分割线 ── */
+.receipt-card__divider {
+  border: none;
+  margin: 5px 0;
+  font-size: 13px;
+  line-height: 1;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.receipt-card__divider::before {
+  content: '--------------------------------';
+  display: block;
+  letter-spacing: -0.5px;
+}
+
+.receipt-card__divider--dots::before {
+  content: '-  -  -  -  -  -  -  -  -  -  -  -  -  -  -';
+}
+
+/* ── space-between 行（店名/门店/评分/合计） ── */
+.receipt-card__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+.receipt-card__label {
+  white-space: nowrap;
+  color: #6b4f34;
+}
+
+/* ── 店名 — 品牌色 + 衬线体 ── */
+.receipt-card__brand-name {
+  font-family: var(--rc-serif);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.receipt-card__store {
+  font-size: 12px;
+  color: #6b4f34;
+}
+
+/* ── 序号 + 品名 + 价格 ── */
+.receipt-card__item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  line-height: 1.6;
+}
+
+.receipt-card__item-no {
+  width: 3ch;
+  flex-shrink: 0;
+  font-family: var(--rc-mono);
+  font-size: 12.5px;
+  color: #8b6b4a;
+}
+
+.receipt-card__item-name {
+  flex: 1;
+  font-family: var(--rc-serif);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.receipt-card__item-price {
+  text-align: right;
+  flex-shrink: 0;
+  font-family: var(--rc-mono);
+  font-size: 13px;
+  font-weight: bold;
+  margin-left: 1ch;
+}
+
+/* ── 规格 / 小料 ── */
+.receipt-card__specs {
+  font-family: var(--rc-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  padding-left: 3ch;
+  color: #555;
+}
+
+/* ── 评分 ★ ── */
+.receipt-card__stars {
+  font-family: var(--rc-serif);
+  font-size: 14px;
+  letter-spacing: 3px;
+}
+
+/* ── 心情行 — 手写体 + 语音按钮 ── */
+.receipt-card__mood-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  line-height: 1.6;
+}
+
+.receipt-card__mood-label {
+  font-family: var(--rc-mono);
+  font-size: 12px;
+  color: #6b4f34;
+  white-space: nowrap;
+}
+
+.receipt-card__mood-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: right;
+}
+
+.receipt-card__mood-text {
+  font-family: var(--rc-marker);
+  font-size: 15px;
+  color: #4d3724;
+  line-height: 1.4;
+}
+
+/* ── 语音按钮 — SVG 喇叭 ── */
+.receipt-card__voice-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.15s, opacity 0.15s, background 0.15s;
+  padding: 0;
+  opacity: 0.6;
+}
+
+.receipt-card__voice-btn:hover { opacity: 1; }
+
+.receipt-card__voice-btn:active {
+  transform: scale(0.9);
+}
+
+/* 播放中 — 脉冲动画 */
+.receipt-card__voice-btn--playing {
+  opacity: 1;
+  animation: voice-pulse 0.8s ease-in-out infinite;
+}
+
+@keyframes voice-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.12); }
+}
+
+/* ── 打印时间 ── */
+.receipt-card__footer {
+  text-align: center;
+  font-family: var(--rc-mono);
+  font-size: 11px;
+  color: #999;
+  margin-top: 2px;
+}
+
+/* ═══════════════════════════════════════════════════
+   品牌配色映射
+   ═══════════════════════════════════════════════════ */
+
+/* 喜茶 */
+.receipt-card--heytea .receipt-card__brand-name,
+.receipt-card--heytea .receipt-card__item-name,
+.receipt-card--heytea .receipt-card__item-price,
+.receipt-card--heytea .receipt-card__stars { color: #1a1a1a; }
+.receipt-card--heytea .receipt-card__divider::before,
+.receipt-card--heytea .receipt-card__divider--dots::before { color: #c9a87c; opacity: 0.65; }
+.receipt-card--heytea .receipt-card__voice-btn { color: #c9a87c; border-color: #c9a87c; }
+.receipt-card--heytea .receipt-card__torn-edge { color: #c9a87c; }
+
+/* 奈雪 */
+.receipt-card--nayuki .receipt-card__brand-name,
+.receipt-card--nayuki .receipt-card__item-name,
+.receipt-card--nayuki .receipt-card__item-price,
+.receipt-card--nayuki .receipt-card__stars { color: #2d5a27; }
+.receipt-card--nayuki .receipt-card__divider::before,
+.receipt-card--nayuki .receipt-card__divider--dots::before { color: #8bab7a; opacity: 0.65; }
+.receipt-card--nayuki .receipt-card__voice-btn { color: #8bab7a; border-color: #8bab7a; }
+.receipt-card--nayuki .receipt-card__torn-edge { color: #8bab7a; }
+
+/* 蜜雪冰城 */
+.receipt-card--mxbc .receipt-card__brand-name,
+.receipt-card--mxbc .receipt-card__item-name,
+.receipt-card--mxbc .receipt-card__item-price,
+.receipt-card--mxbc .receipt-card__stars { color: #d40016; }
+.receipt-card--mxbc .receipt-card__divider::before,
+.receipt-card--mxbc .receipt-card__divider--dots::before { color: #ff6b6b; opacity: 0.5; }
+.receipt-card--mxbc .receipt-card__voice-btn { color: #ff6b6b; border-color: #ff6b6b; }
+.receipt-card--mxbc .receipt-card__torn-edge { color: #ff6b6b; }
+
+/* 茶百道 */
+.receipt-card--chabaidao .receipt-card__brand-name,
+.receipt-card--chabaidao .receipt-card__item-name,
+.receipt-card--chabaidao .receipt-card__item-price,
+.receipt-card--chabaidao .receipt-card__stars { color: #1a5276; }
+.receipt-card--chabaidao .receipt-card__divider::before,
+.receipt-card--chabaidao .receipt-card__divider--dots::before { color: #5dade2; opacity: 0.6; }
+.receipt-card--chabaidao .receipt-card__voice-btn { color: #5dade2; border-color: #5dade2; }
+.receipt-card--chabaidao .receipt-card__torn-edge { color: #5dade2; }
+
+/* 霸王茶姬 */
+.receipt-card--bwcj .receipt-card__brand-name,
+.receipt-card--bwcj .receipt-card__item-name,
+.receipt-card--bwcj .receipt-card__item-price,
+.receipt-card--bwcj .receipt-card__stars { color: #4a235a; }
+.receipt-card--bwcj .receipt-card__divider::before,
+.receipt-card--bwcj .receipt-card__divider--dots::before { color: #d4a574; opacity: 0.65; }
+.receipt-card--bwcj .receipt-card__voice-btn { color: #d4a574; border-color: #d4a574; }
+.receipt-card--bwcj .receipt-card__torn-edge { color: #d4a574; }
+
+/* 默认 */
+.receipt-card--default .receipt-card__brand-name,
+.receipt-card--default .receipt-card__item-name,
+.receipt-card--default .receipt-card__item-price,
+.receipt-card--default .receipt-card__stars { color: #5d4037; }
+.receipt-card--default .receipt-card__divider::before,
+.receipt-card--default .receipt-card__divider--dots::before { color: #a08060; opacity: 0.65; }
+.receipt-card--default .receipt-card__voice-btn { color: #a08060; border-color: #a08060; }
+.receipt-card--default .receipt-card__torn-edge { color: #a08060; }
+
+/* ═══════════════════════════════════════════════════
+   Modal 紧凑变体（日历弹窗内用，适配手机屏无滚动）
+   ═══════════════════════════════════════════════════ */
+
+.receipt-card--modal {
+  max-width: 100%;
+  padding: 4px 12px 8px;
+  box-shadow: none;
+}
+
+.receipt-card--modal .receipt-card__cutout-top {
+  padding: 2px 0 6px;
+}
+
+.receipt-card--modal .receipt-card__cutout-top img {
+  max-width: 110px;
+  max-height: 110px;
+}
+
+.receipt-card--modal .receipt-card__cutout-top--empty {
+  min-height: 80px;
+}
+
+.receipt-card--modal .receipt-card__divider {
+  margin: 3px 0;
+  font-size: 11px;
+}
+
+.receipt-card--modal .receipt-card__brand-name {
+  font-size: 14px;
+}
+
+.receipt-card--modal .receipt-card__item-name {
+  font-size: 15px;
+}
+
+.receipt-card--modal .receipt-card__item-price {
+  font-size: 12px;
+}
+
+.receipt-card--modal .receipt-card__specs {
+  font-size: 11px;
+}
+
+.receipt-card--modal .receipt-card__stars {
+  font-size: 13px;
+  letter-spacing: 2px;
+}
+
+.receipt-card--modal .receipt-card__mood-text {
+  font-size: 14px;
+}
+
+.receipt-card--modal .receipt-card__row {
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+.receipt-card--modal .receipt-card__store {
+  font-size: 11px;
+}
+
+.receipt-card--modal .receipt-card__footer {
+  font-size: 10px;
+}
+
+.receipt-card--modal .receipt-card__torn-edge {
+  height: 5px;
+}
+
+/* ═══════════════════════════════════════════════════
+   Printing 修饰类（Step6 打印覆盖层内用，消除交互样式）
+   ═══════════════════════════════════════════════════ */
+
+.receipt-card--printing {
+  cursor: default !important;
+  box-shadow: none !important;
+  transform: none !important;
+  max-width: 100%;
+  width: 100%;
+  margin: 0;
+}
+
+.receipt-card--printing:active {
+  transform: none !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   响应式
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 400px) {
+  .receipt-card {
+    max-width: 100%;
+    padding: 4px 12px 10px;
+  }
+  .receipt-card__brand-name { font-size: 15px; }
+  .receipt-card__item-name { font-size: 16px; }
+  .receipt-card__cutout-top img {
+    max-width: 140px;
+    max-height: 140px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   日期分组（ListPage 用）
+   ═══════════════════════════════════════════════════ */
+
+.receipt-date-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.receipt-date-group__header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-2);
+  padding: 0 var(--spacing-1);
+}
+
+.receipt-date-group__label {
+  font-family: var(--font-family-display);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-tea-600);
+}
+
+.receipt-date-group__count {
+  font-family: var(--font-family-body);
+  font-size: var(--text-xs);
+  color: var(--color-text-hint);
+}
+
+/* ═══════════════════════════════════════════════════
+   小票轮播（ListPage 同日期多张）
+   ═══════════════════════════════════════════════════ */
+
+.receipt-carousel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.receipt-carousel__track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  gap: var(--spacing-3);
+  scrollbar-width: none;
+  padding: 0 var(--spacing-1);
+}
+
+.receipt-carousel__track::-webkit-scrollbar {
+  display: none;
+}
+
+.receipt-carousel__page {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+
+.receipt-carousel__dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-2);
+}
+
+.receipt-carousel__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--color-tea-300);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-default);
+  padding: 0;
+}
+
+.receipt-carousel__dot--active {
+  background: var(--color-accent);
+  width: 16px;
+  border-radius: 3px;
+}

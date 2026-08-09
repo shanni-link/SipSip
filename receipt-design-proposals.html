@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧾 小票设计方案对比 — 奶茶记录仪</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Ma+Shan+Zheng&family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════════════════
+   共享基础变量（与项目 design-system.css 一致）
+   ══════════════════════════════════════════════════════════ */
+:root {
+  --tea-50:   #fbf5ed;
+  --tea-100:  #f5e6d3;
+  --tea-200:  #ebd3b0;
+  --tea-300:  #d4b68a;
+  --tea-400:  #b8946e;
+  --tea-500:  #8b6b4a;
+  --tea-600:  #6b4f34;
+  --tea-700:  #4d3724;
+  --tea-800:  #2f1f12;
+  --tea-900:  #1a0f06;
+  --accent:        #c94a3a;
+  --accent-light:  #e57363;
+  --accent-glow:   rgba(201,74,58,0.20);
+  --success: #5a8f6c;
+  --surface: #fffdf7;
+  --border:  #e0cfb5;
+  --divider: #ede0cf;
+  --text-primary:   var(--tea-800);
+  --text-secondary: var(--tea-600);
+  --text-hint:      var(--tea-400);
+  --font-display: 'Noto Serif SC', serif;
+  --font-body:    'Zen Kaku Gothic New', 'PingFang SC', sans-serif;
+  --font-receipt: 'Courier New', monospace;
+  --font-stamp:   'Ma Shan Zheng', cursive;
+  --font-marker:  'ZCOOL KuaiLe', cursive;
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+  --radius-full: 9999px;
+  --shadow-sm:  0 1px 3px rgba(47,31,18,0.06);
+  --shadow-md:  0 4px 16px rgba(47,31,18,0.10);
+  --shadow-lg:  0 8px 30px rgba(47,31,18,0.14);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background-color: var(--tea-50);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  padding: 40px 16px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   页面头部
+   ══════════════════════════════════════════════════════════ */
+.page-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.page-header h1 {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--tea-800);
+  margin-bottom: 4px;
+}
+.page-header .subtitle {
+  font-family: var(--font-marker);
+  font-size: 16px;
+  color: var(--accent);
+  transform: rotate(-1deg);
+  display: inline-block;
+}
+.page-header .note {
+  font-size: 13px;
+  color: var(--text-hint);
+  margin-top: 8px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   对比网格布局
+   ══════════════════════════════════════════════════════════ */
+.comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 40px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.design-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.design-label {
+  text-align: center;
+}
+.design-label .letter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--tea-800);
+  color: var(--tea-50);
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.design-label h2 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--tea-800);
+}
+.design-label .tagline {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+.design-label .desc {
+  font-size: 13px;
+  color: var(--text-hint);
+  margin-top: 4px;
+  max-width: 280px;
+  line-height: 1.5;
+}
+
+/* ══════════════════════════════════════════════════════════
+   共享：奶茶抠图占位
+   ══════════════════════════════════════════════════════════ */
+.cutout-img {
+  display: block;
+  object-fit: contain;
+  /* 通用描边，各设计可覆盖 */
+  filter:
+    drop-shadow( 0   1px 0 rgba(255,255,255,0.82))
+    drop-shadow( 0  -1px 0 rgba(255,255,255,0.82))
+    drop-shadow( 1px  0  0 rgba(255,255,255,0.82))
+    drop-shadow(-1px  0  0 rgba(255,255,255,0.82))
+    drop-shadow( 0   0 1.2px rgba(255,255,255,0.55));
+}
+
+.cutout-placeholder {
+  background: linear-gradient(135deg, var(--tea-100), var(--tea-200));
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   印章评分（共享）
+   ══════════════════════════════════════════════════════════ */
+.stamp-dot {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.stamp-dot.on {
+  border: 1.6px solid var(--accent);
+  color: var(--accent);
+  font-family: var(--font-stamp);
+  font-size: 12px;
+  font-weight: 700;
+  transform: rotate(-3deg);
+  text-shadow: 0 0 2px rgba(201,74,58,0.3);
+}
+.stamp-dot.off {
+  border: 1.2px dashed var(--tea-300);
+  background: transparent;
+}
+
+/* ══════════════════════════════════════════════════════════
+   共享：虚线分隔
+   ══════════════════════════════════════════════════════════ */
+.dashed-line {
+  border: none;
+  border-top: 1px dashed var(--divider);
+}
+
+/* ══════════════════════════════════════════════════════════
+   DESIGN A — 茶韵·雅  "茶室小票"
+   ══════════════════════════════════════════════════════════ */
+.receipt-a {
+  width: 100%; max-width: 360px;
+  background: var(--surface);
+  border-radius: 4px 12px 12px 4px;
+  box-shadow: var(--shadow-md), 0 0 0 1px rgba(47,31,18,0.04);
+  position: relative;
+  overflow: hidden;
+  /* 左侧品牌色竖条 — 像高级茶室的收据夹 */
+  border-left: 4px solid #5d4037;
+}
+
+.receipt-a__body {
+  padding: 28px 28px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 抠图 + 品牌组合行 */
+.receipt-a__hero {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.receipt-a__cutout-wrap {
+  flex-shrink: 0;
+  position: relative;
+}
+
+.receipt-a__cutout {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  filter:
+    drop-shadow( 0   1px 0 rgba(255,255,255,0.82))
+    drop-shadow( 0  -1px 0 rgba(255,255,255,0.82))
+    drop-shadow( 1px  0  0 rgba(255,255,255,0.82))
+    drop-shadow(-1px  0  0 rgba(255,255,255,0.82))
+    drop-shadow( 0   0 1.2px rgba(255,255,255,0.55));
+}
+
+/* 茶渍水彩圆 — 抠图背后的暖色光晕 */
+.receipt-a__cutout-wrap::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 40% 50%, rgba(139,107,74,0.10) 0%, transparent 70%);
+  z-index: -1;
+}
+
+.receipt-a__info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 4px;
+}
+
+.receipt-a__name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--tea-800);
+  line-height: 1.3;
+  margin: 0;
+}
+
+.receipt-a__brand {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tea-500);
+  letter-spacing: 0.03em;
+}
+
+.receipt-a__store {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-hint);
+}
+
+/* 规格标签行 */
+.receipt-a__specs-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.receipt-a__spec-tag {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--tea-600);
+  background: var(--tea-100);
+  border-radius: var(--radius-full);
+  padding: 3px 12px;
+  letter-spacing: 0.02em;
+}
+
+/* 小料 */
+.receipt-a__toppings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.receipt-a__topping {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--tea-500);
+  border: 1px dashed var(--tea-300);
+  border-radius: var(--radius-full);
+  padding: 2px 10px;
+}
+
+/* 底部：价格右对齐 + 印章左 → 视觉张力 */
+.receipt-a__bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-top: 4px;
+}
+
+.receipt-a__stamps {
+  display: flex;
+  gap: 5px;
+}
+
+.receipt-a__mood-date {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1px dashed var(--divider);
+}
+
+.receipt-a__mood {
+  font-family: var(--font-marker);
+  font-size: 14px;
+  color: var(--tea-600);
+  line-height: 1.5;
+}
+
+.receipt-a__voice {
+  display: flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--tea-100);
+  color: var(--tea-500);
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.receipt-a__date {
+  font-family: var(--font-receipt);
+  font-size: 12px;
+  color: var(--text-hint);
+  letter-spacing: 0.06em;
+}
+
+/* 右侧价格大号 */
+.receipt-a__price-tag {
+  text-align: right;
+  line-height: 1;
+}
+.receipt-a__price {
+  font-family: var(--font-receipt);
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--tea-800);
+  letter-spacing: 0.02em;
+}
+
+/* ══════════════════════════════════════════════════════════
+   DESIGN B — 手帐·趣  "手账拍立得"
+   ══════════════════════════════════════════════════════════ */
+.receipt-b {
+  width: 100%; max-width: 360px;
+  background: #fefcf7;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md), 0 0 0 1px rgba(47,31,18,0.04);
+  position: relative;
+  overflow: visible;
+  /* 模拟胶带贴在纸上的效果 */
+}
+
+/* 顶部装饰胶带 */
+.receipt-b__tape {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-3deg);
+  width: 70px;
+  height: 28px;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(255,220,180,0.7),
+    rgba(255,220,180,0.7) 4px,
+    rgba(255,240,220,0.7) 4px,
+    rgba(255,240,220,0.7) 8px
+  );
+  border-radius: 2px;
+  z-index: 5;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.receipt-b__body {
+  padding: 28px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* 抠图区 — 像拍立得相纸 */
+.receipt-b__cutout-area {
+  display: flex;
+  justify-content: center;
+}
+
+.receipt-b__polaroid {
+  background: #fff;
+  padding: 10px 10px 24px 10px;
+  box-shadow: 0 2px 8px rgba(47,31,18,0.10);
+  border-radius: 3px;
+  transform: rotate(-2deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.receipt-b__cutout {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+}
+
+.receipt-b__polaroid-caption {
+  font-family: var(--font-marker);
+  font-size: 11px;
+  color: var(--tea-500);
+  margin-top: 6px;
+  text-align: center;
+}
+
+/* 标题 + 印章 同行 */
+.receipt-b__title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.receipt-b__name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--tea-800);
+  line-height: 1.3;
+}
+
+.receipt-b__brand-store {
+  font-family: var(--font-marker);
+  font-size: 12px;
+  color: var(--tea-500);
+}
+
+/* 印章放右上角 */
+.receipt-b__stamp-cluster {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+/* 规格 inline */
+.receipt-b__specs {
+  font-family: var(--font-receipt);
+  font-size: 12px;
+  color: var(--text-secondary);
+  letter-spacing: 0.03em;
+}
+
+/* 小料 marker-style */
+.receipt-b__toppings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.receipt-b__topping {
+  font-family: var(--font-marker);
+  font-size: 12px;
+  color: var(--tea-500);
+}
+
+/* 价格 — 手写风 */
+.receipt-b__price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-top: 1px dotted var(--tea-200);
+  padding-top: 10px;
+}
+
+.receipt-b__price {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--tea-800);
+}
+
+.receipt-b__date-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--text-hint);
+  background: var(--tea-100);
+  border-radius: var(--radius-full);
+  padding: 4px 12px;
+}
+
+/* 心情框 — 手绘虚线框 */
+.receipt-b__mood-box {
+  border: 1.5px dashed var(--tea-300);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.receipt-b__mood {
+  font-family: var(--font-marker);
+  font-size: 14px;
+  color: var(--tea-600);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.receipt-b__voice {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--tea-200);
+  color: var(--tea-500);
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════════════════
+   DESIGN C — 极简·禅  "一筆·茶"
+   ══════════════════════════════════════════════════════════ */
+.receipt-c {
+  width: 100%; max-width: 360px;
+  background: #fefefb;
+  border-radius: 2px;
+  box-shadow: 0 2px 20px rgba(47,31,18,0.06);
+  position: relative;
+}
+
+.receipt-c__body {
+  padding: 40px 36px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+
+/* 抠图 — 大留白中漂浮 */
+.receipt-c__cutout-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.receipt-c__cutout {
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+}
+
+/* 奶茶名 — 居中但克制 */
+.receipt-c__name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--tea-800);
+  text-align: center;
+  line-height: 1.4;
+  letter-spacing: 0.06em;
+}
+
+/* 品牌店 — 极小的衬线文字 */
+.receipt-c__brand-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.receipt-c__brand-dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--tea-300);
+  flex-shrink: 0;
+}
+
+.receipt-c__brand {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-hint);
+  letter-spacing: 0.04em;
+  font-weight: 400;
+}
+
+/* 细线分隔 */
+.receipt-c__hairline {
+  width: 80px;
+  border: none;
+  border-top: 0.5px solid var(--tea-300);
+}
+
+/* 规格行 */
+.receipt-c__specs {
+  display: flex;
+  gap: 16px;
+}
+
+.receipt-c__spec {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--tea-500);
+  letter-spacing: 0.02em;
+}
+
+/* 小料 — 极简单行 */
+.receipt-c__toppings {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--text-hint);
+  letter-spacing: 0.03em;
+}
+
+/* 印章 — 只有它是颜色 */
+.receipt-c__stamps {
+  display: flex;
+  gap: 10px;
+}
+
+.receipt-c__stamp {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.receipt-c__stamp.on {
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-stamp);
+  font-size: 10px;
+  transform: rotate(-3deg);
+  box-shadow: 0 0 4px rgba(201,74,58,0.2);
+}
+.receipt-c__stamp.off {
+  border: 1px solid var(--tea-200);
+}
+
+/* 价格 — 极大留白对比 */
+.receipt-c__price {
+  font-family: var(--font-body);
+  font-size: 36px;
+  font-weight: 300;
+  color: var(--tea-800);
+  letter-spacing: 0.04em;
+}
+
+/* 心情 — 最小存在感 */
+.receipt-c__mood-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+}
+
+.receipt-c__mood {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-hint);
+  font-style: italic;
+  letter-spacing: 0.02em;
+}
+
+.receipt-c__date {
+  font-family: var(--font-receipt);
+  font-size: 10px;
+  color: var(--tea-300);
+  letter-spacing: 0.08em;
+}
+
+/* ══════════════════════════════════════════════════════════
+   DESIGN D — 复古·票  "老式票据"
+   ══════════════════════════════════════════════════════════ */
+.receipt-d {
+  width: 100%; max-width: 360px;
+  background: #fdf9f2;
+  border-radius: 3px;
+  box-shadow: var(--shadow-md), 0 0 0 1px rgba(47,31,18,0.06);
+  position: relative;
+  /* 仿旧纸纹理 */
+  background-image:
+    radial-gradient(ellipse at 20% 80%, rgba(139,107,74,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(139,107,74,0.03) 0%, transparent 50%);
+}
+
+/* 上下穿孔线 */
+.receipt-d::before,
+.receipt-d::after {
+  content: '';
+  display: block;
+  height: 12px;
+  background: radial-gradient(circle, var(--tea-300) 1.2px, transparent 1.5px);
+  background-size: 12px 12px;
+  background-position: 0 6px;
+  opacity: 0.5;
+}
+
+.receipt-d__body {
+  padding: 20px 28px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 票号 */
+.receipt-d__ticket-no {
+  text-align: center;
+  font-family: var(--font-receipt);
+  font-size: 11px;
+  color: var(--tea-300);
+  letter-spacing: 0.1em;
+}
+
+/* 双线标题区 */
+.receipt-d__header {
+  text-align: center;
+  border-top: 1.5px solid var(--tea-800);
+  border-bottom: 1.5px solid var(--tea-800);
+  padding: 10px 0;
+}
+
+.receipt-d__name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--tea-800);
+  letter-spacing: 0.08em;
+}
+
+.receipt-d__brand {
+  font-family: var(--font-receipt);
+  font-size: 11px;
+  color: var(--tea-500);
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
+/* 抠图 — 放在票据中 */
+.receipt-d__cutout-row {
+  display: flex;
+  justify-content: center;
+  padding: 6px 0;
+}
+
+.receipt-d__cutout {
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+}
+
+/* 细节表格式 */
+.receipt-d__details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 16px;
+  font-family: var(--font-receipt);
+  font-size: 11px;
+  color: var(--tea-600);
+  letter-spacing: 0.04em;
+}
+
+.receipt-d__label {
+  color: var(--text-hint);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.receipt-d__value {
+  color: var(--text-primary);
+}
+
+/* 小料 */
+.receipt-d__toppings {
+  font-family: var(--font-receipt);
+  font-size: 11px;
+  color: var(--tea-500);
+  letter-spacing: 0.03em;
+}
+
+/* 印章 + 价格同行 */
+.receipt-d__footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-top: 1px solid var(--tea-300);
+  padding-top: 12px;
+}
+
+.receipt-d__stamps {
+  display: flex;
+  gap: 4px;
+}
+
+.receipt-d__price {
+  font-family: var(--font-receipt);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--tea-800);
+  letter-spacing: 0.04em;
+}
+
+/* 日期栏 */
+.receipt-d__date-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-receipt);
+  font-size: 11px;
+  color: var(--text-hint);
+  letter-spacing: 0.06em;
+  border-top: 1px dotted var(--tea-200);
+  padding-top: 8px;
+}
+
+.receipt-d__mood-text {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--tea-500);
+  font-style: italic;
+}
+
+.receipt-d__voice {
+  display: flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--tea-200);
+  color: var(--tea-500);
+  flex-shrink: 0;
+  margin-left: 6px;
+}
+
+.receipt-d__mood-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   响应式
+   ══════════════════════════════════════════════════════════ */
+@media (max-width: 760px) {
+  .comparison-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   投票区提示
+   ══════════════════════════════════════════════════════════ */
+.vote-hint {
+  text-align: center;
+  margin-top: 56px;
+  padding: 28px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1.5px dashed var(--tea-300);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.vote-hint p {
+  font-family: var(--font-display);
+  font-size: 17px;
+  color: var(--tea-700);
+  margin-bottom: 4px;
+}
+.vote-hint .emoji-row {
+  font-size: 28px;
+  letter-spacing: 8px;
+  margin-top: 8px;
+}
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <h1>🧾 小票设计方案对比</h1>
+  <div class="subtitle">同一杯茶，四种表达</div>
+  <div class="note">所有设计共享：奶茶棕色彩系统 · 印章评分 · 中文排版 · 240×180 抠图 · 相同数据</div>
+</header>
+
+<div class="comparison-grid">
+
+  <!-- ═══════════════════ DESIGN A ═══════════════════ -->
+  <div class="design-column">
+    <div class="design-label">
+      <span class="letter">A</span>
+      <h2>茶韵·雅</h2>
+      <div class="tagline">「茶室收据」</div>
+      <div class="desc">左侧品牌色竖条 + 抠图左置 + 价格右对齐创造视觉张力。<br>茶渍水彩光晕作为抠图背景，温暖克制。</div>
+    </div>
+
+    <div class="receipt-a">
+      <div class="receipt-a__body">
+        <!-- 抠图 + 信息 横向布局 -->
+        <div class="receipt-a__hero">
+          <div class="receipt-a__cutout-wrap">
+            <div class="cutout-placeholder" style="width:100px;height:100px;border-radius:8px;">🧋</div>
+          </div>
+          <div class="receipt-a__info">
+            <h3 class="receipt-a__name">多肉葡萄</h3>
+            <span class="receipt-a__brand">喜茶</span>
+            <span class="receipt-a__store">中山公园店</span>
+          </div>
+        </div>
+
+        <!-- 规格标签 -->
+        <div class="receipt-a__specs-row">
+          <span class="receipt-a__spec-tag">大杯</span>
+          <span class="receipt-a__spec-tag">少冰</span>
+          <span class="receipt-a__spec-tag">半糖</span>
+        </div>
+
+        <!-- 小料 -->
+        <div class="receipt-a__toppings">
+          <span class="receipt-a__topping">+珍珠</span>
+          <span class="receipt-a__topping">+脆波波</span>
+        </div>
+
+        <!-- 印章 + 价格 -->
+        <div class="receipt-a__bottom">
+          <div class="receipt-a__stamps">
+            <span class="stamp-dot on">★</span>
+            <span class="stamp-dot on">★</span>
+            <span class="stamp-dot on">★</span>
+            <span class="stamp-dot on">★</span>
+            <span class="stamp-dot off"></span>
+          </div>
+          <div class="receipt-a__price-tag">
+            <span class="receipt-a__price">¥ 18</span>
+          </div>
+        </div>
+
+        <!-- 心情 + 日期 -->
+        <div class="receipt-a__mood-date">
+          <span class="receipt-a__mood">"今天超开心！珍珠很Q弹~"</span>
+          <span class="receipt-a__date">2026.06.22</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ DESIGN B ═══════════════════ -->
+  <div class="design-column">
+    <div class="design-label">
+      <span class="letter">B</span>
+      <h2>手帐·趣</h2>
+      <div class="tagline">「手账拍立得」</div>
+      <div class="desc">和纸胶带 + 拍立得白边 + 手绘虚线心情框。<br>ZCOOL KuaiLe 手写体点睛，像闺蜜写的便签。</div>
+    </div>
+
+    <div class="receipt-b">
+      <div class="receipt-b__tape"></div>
+      <div class="receipt-b__body">
+        <!-- 拍立得抠图 -->
+        <div class="receipt-b__cutout-area">
+          <div class="receipt-b__polaroid">
+            <div class="cutout-placeholder" style="width:120px;height:120px;border-radius:2px;">🧋</div>
+            <span class="receipt-b__polaroid-caption">2026.06.22</span>
+          </div>
+        </div>
+
+        <!-- 标题 + 印章 -->
+        <div class="receipt-b__title-row">
+          <div>
+            <h3 class="receipt-b__name">多肉葡萄</h3>
+            <span class="receipt-b__brand-store">喜茶 · 中山公园店</span>
+          </div>
+          <div class="receipt-b__stamp-cluster">
+            <span class="stamp-dot on">★</span>
+            <span class="stamp-dot on">★</span>
+            <span class="stamp-dot on">★</span>
+            <span class="stamp-dot on">★</span>
+            <span class="stamp-dot off"></span>
+          </div>
+        </div>
+
+        <!-- 规格 -->
+        <div class="receipt-b__specs">大杯 · 少冰 · 半糖</div>
+
+        <!-- 小料 -->
+        <div class="receipt-b__toppings">
+          <span class="receipt-b__topping">✦ 珍珠</span>
+          <span class="receipt-b__topping">✦ 脆波波</span>
+        </div>
+
+        <!-- 价格 + 日期 -->
+        <div class="receipt-b__price-row">
+          <span class="receipt-b__price">¥ 18.00</span>
+          <span class="receipt-b__date-badge">📅 6月22日</span>
+        </div>
+
+        <!-- 心情 -->
+        <div class="receipt-b__mood-box">
+          <span class="receipt-b__mood">"今天超开心！珍珠很Q弹~"</span>
+          <span class="receipt-b__voice">🔊</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ DESIGN C ═══════════════════ -->
+  <div class="design-column">
+    <div class="design-label">
+      <span class="letter">C</span>
+      <h2>极简·禅</h2>
+      <div class="tagline">「一筆·茶」</div>
+      <div class="desc">日本茶道"一期一会"的克制美学。<br>极大留白、极细线、印章是唯一颜色。<br>价格用 300 字重，轻盈有呼吸感。</div>
+    </div>
+
+    <div class="receipt-c">
+      <div class="receipt-c__body">
+        <!-- 抠图漂浮 -->
+        <div class="receipt-c__cutout-wrap">
+          <div class="cutout-placeholder" style="width:140px;height:140px;border-radius:50%;">🧋</div>
+        </div>
+
+        <!-- 茶名 -->
+        <h3 class="receipt-c__name">多肉葡萄</h3>
+
+        <!-- 品牌 · 店 -->
+        <div class="receipt-c__brand-row">
+          <span class="receipt-c__brand">喜茶</span>
+          <span class="receipt-c__brand-dot"></span>
+          <span class="receipt-c__brand">中山公园店</span>
+        </div>
+
+        <hr class="receipt-c__hairline">
+
+        <!-- 规格 -->
+        <div class="receipt-c__specs">
+          <span class="receipt-c__spec">大杯</span>
+          <span class="receipt-c__spec">少冰</span>
+          <span class="receipt-c__spec">半糖</span>
+        </div>
+
+        <!-- 小料 -->
+        <div class="receipt-c__toppings">珍珠 · 脆波波</div>
+
+        <!-- 印章 -->
+        <div class="receipt-c__stamps">
+          <span class="receipt-c__stamp on">★</span>
+          <span class="receipt-c__stamp on">★</span>
+          <span class="receipt-c__stamp on">★</span>
+          <span class="receipt-c__stamp on">★</span>
+          <span class="receipt-c__stamp off"></span>
+        </div>
+
+        <!-- 价格 -->
+        <div class="receipt-c__price">¥ 18</div>
+
+        <!-- 心情 -->
+        <div class="receipt-c__mood-line">
+          <span class="receipt-c__mood">"今天超开心！珍珠很Q弹~"</span>
+          <span style="font-size:10px;color:var(--tea-300);">🔊</span>
+        </div>
+
+        <span class="receipt-c__date">2026.06.22</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ DESIGN D ═══════════════════ -->
+  <div class="design-column">
+    <div class="design-label">
+      <span class="letter">D</span>
+      <h2>复古·票</h2>
+      <div class="tagline">「老式票据」</div>
+      <div class="desc">穿孔线 + 票号 + 双线标题 + 表格细节。<br>Courier New 等宽字体主导，像老茶馆的记账单。<br>仿旧纸泛黄渐变纹理。</div>
+    </div>
+
+    <div class="receipt-d">
+      <div class="receipt-d__body">
+        <!-- 票号 -->
+        <div class="receipt-d__ticket-no">NO. 20260622-003</div>
+
+        <!-- 双线标题 -->
+        <div class="receipt-d__header">
+          <div class="receipt-d__name">多肉葡萄</div>
+          <div class="receipt-d__brand">HEYTEA · 喜茶</div>
+        </div>
+
+        <!-- 抠图 -->
+        <div class="receipt-d__cutout-row">
+          <div class="cutout-placeholder" style="width:110px;height:110px;border-radius:4px;">🧋</div>
+        </div>
+
+        <!-- 表格式细节 -->
+        <div class="receipt-d__details">
+          <span class="receipt-d__label">门店</span>
+          <span class="receipt-d__value">中山公园店</span>
+          <span class="receipt-d__label">规格</span>
+          <span class="receipt-d__value">大杯 / 少冰 / 半糖</span>
+          <span class="receipt-d__label">加料</span>
+          <span class="receipt-d__value">珍珠 · 脆波波</span>
+        </div>
+
+        <!-- 印章 + 价格 -->
+        <div class="receipt-d__footer-row">
+          <div class="receipt-d__stamps">
+            <span class="stamp-dot on">★</span>
+            <span class="stamp-dot on">★</span>
+            <span class="stamp-dot on">★</span>
+            <span class="stamp-dot on">★</span>
+            <span class="stamp-dot off"></span>
+          </div>
+          <span class="receipt-d__price">¥ 18.00</span>
+        </div>
+
+        <!-- 日期 + 心情 -->
+        <div class="receipt-d__date-row">
+          <span>2026.06.22 14:30</span>
+          <div class="receipt-d__mood-wrap">
+            <span class="receipt-d__mood-text">今天超开心！珍珠很Q弹~</span>
+            <span class="receipt-d__voice">🔊</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 底部提示 -->
+<div class="vote-hint">
+  <p>📩 请告诉我你喜欢哪一组？</p>
+  <p style="font-size:14px;color:var(--text-secondary);margin-top:4px;">可以单选、混搭（如"A的布局 + B的拍立得"），确认后我更新到软件中</p>
+  <div class="emoji-row">A &nbsp; B &nbsp; C &nbsp; D</div>
+</div>
+
+</body>
+</html>

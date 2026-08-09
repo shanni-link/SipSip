@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧋 奶茶记录仪 · 设计系统可交互原型</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Ma+Shan+Zheng&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+<style>
+/* ========================================
+   CSS Custom Properties (Dynamic)
+   ======================================== */
+:root {
+  --tea-50:   #fbf5ed;   --tea-100:  #f5e6d3;   --tea-200:  #ebd3b0;
+  --tea-300:  #d4b68a;   --tea-400:  #b8946e;   --tea-500:  #8b6b4a;
+  --tea-600:  #6b4f34;   --tea-700:  #4d3724;   --tea-800:  #2f1f12;
+  --tea-900:  #1a0f06;
+  --accent:        #c94a3a;   --accent-light:  #e57363;
+  --accent-dark:   #9e3527;   --accent-glow:   rgba(201,74,58,0.25);
+  --success: #5a8f6c;  --warning: #d4943a;  --error: #c94a3a;  --info: #7a9eb3;
+  --color-tea-50: var(--tea-50);  --color-tea-100: var(--tea-100);
+  --color-tea-200: var(--tea-200);  --color-tea-300: var(--tea-300);
+  --color-tea-400: var(--tea-400);  --color-tea-500: var(--tea-500);
+  --color-tea-600: var(--tea-600);  --color-tea-700: var(--tea-700);
+  --color-tea-800: var(--tea-800);  --color-tea-900: var(--tea-900);
+  --color-accent: var(--accent);  --color-accent-light: var(--accent-light);
+  --color-accent-dark: var(--accent-dark);  --color-accent-glow: var(--accent-glow);
+  --color-success: var(--success);  --color-warning: var(--warning);
+  --color-error: var(--error);  --color-info: var(--info);
+  --color-bg: var(--tea-50);  --color-surface: #fffdf7;
+  --color-border: #e0cfb5;  --color-divider: #ede0cf;
+  --color-text-primary: var(--tea-800);  --color-text-secondary: var(--tea-600);
+  --color-text-hint: var(--tea-400);  --color-text-inverse: #fffdf7;
+  --font-family-display: 'Noto Serif SC', serif;
+  --font-family-body: 'Zen Kaku Gothic New', sans-serif;
+  --font-family-receipt: 'Courier New', monospace;
+  --font-family-stamp: 'Ma Shan Zheng', cursive;
+  --font-family-marker: 'ZCOOL KuaiLe', cursive;
+  --text-xs:10px; --text-sm:12px; --text-base:15px; --text-md:17px;
+  --text-lg:20px; --text-xl:24px; --text-2xl:32px; --text-3xl:40px;
+  --font-weight-normal:400; --font-weight-medium:500;
+  --font-weight-semibold:600; --font-weight-bold:700;
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px;
+  --space-5:20px; --space-6:24px; --space-8:32px; --space-10:40px;
+  --space-12:48px; --space-16:64px;
+  --spacing-1:4px; --spacing-2:8px; --spacing-3:12px; --spacing-4:16px;
+  --spacing-5:20px; --spacing-6:24px; --spacing-8:32px; --spacing-10:40px;
+  --spacing-12:48px; --spacing-16:64px;
+  --radius-sm:4px; --radius-md:8px; --radius-lg:12px; --radius-xl:16px; --radius-full:9999px;
+  --shadow-sm:0 1px 3px rgba(47,31,18,0.06);
+  --shadow-md:0 4px 16px rgba(47,31,18,0.10);
+  --shadow-lg:0 8px 30px rgba(47,31,18,0.14);
+  --shadow-glow:0 0 20px rgba(212,148,58,0.25);
+  --ease-default:cubic-bezier(0.4,0,0.2,1);
+  --ease-bounce:cubic-bezier(0.34,1.56,0.64,1);
+  --ease-spring:cubic-bezier(0.68,-0.55,0.27,1.55);
+  --duration-instant:100ms; --duration-fast:150ms; --duration-normal:300ms;
+  --duration-slow:500ms; --duration-tear:600ms; --duration-stamp:400ms; --duration-fly:600ms;
+  --noise-opacity:0.035;
+  --stamp-rotation:-3deg; --stamp-blur:2px;
+  --card-max-width:360px;
+}
+
+/* ========================================
+   Global Layout
+   ======================================== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:#ede6d8;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  font-family:var(--font-family-body); font-size:13px; color:var(--color-text-primary);
+  display:flex; flex-direction:column; height:100vh; overflow:hidden;
+}
+
+/* ═══════════════════ Tab Bar ═══════════════════ */
+#tab-bar{
+  display:flex; align-items:stretch;
+  background:var(--color-surface); border-bottom:1px solid var(--color-divider);
+  overflow-x:auto; flex-shrink:0; z-index:10;
+  box-shadow:0 2px 12px rgba(47,31,18,0.05);
+}
+#tab-bar::-webkit-scrollbar{height:3px}
+#tab-bar::-webkit-scrollbar-thumb{background:var(--color-tea-300);border-radius:3px}
+.tab-btn{
+  flex-shrink:0; padding:10px 16px; border:none; background:transparent;
+  font-family:var(--font-family-body); font-size:12px; font-weight:var(--font-weight-medium);
+  color:var(--color-text-secondary); cursor:pointer;
+  border-bottom:2px solid transparent; transition:all var(--duration-fast) var(--ease-default);
+  white-space:nowrap;
+}
+.tab-btn:hover{color:var(--color-text-primary);background:var(--color-tea-50)}
+.tab-btn.active{color:var(--color-accent);border-bottom-color:var(--color-accent);font-weight:var(--font-weight-semibold)}
+.tab-btn .tab-emoji{font-size:16px;display:block;text-align:center}
+.tab-btn .tab-label{display:block;text-align:center;margin-top:2px}
+
+/* ═══════════════════ Main Content Area ═══════════════════ */
+#main-area{
+  display:flex; flex:1; overflow:hidden;
+}
+
+/* ── Phone Mockup ── */
+#phone-wrap{
+  flex:1; display:flex; align-items:center; justify-content:center;
+  padding:16px; min-width:0; overflow-y:auto;
+}
+#phone{
+  width:375px; min-width:375px; height:700px;
+  background:var(--color-surface); border-radius:24px;
+  box-shadow:0 8px 40px rgba(47,31,18,0.18), 0 0 0 4px #d4b68a, 0 0 0 8px #5d4037;
+  overflow-y:auto; overflow-x:hidden; position:relative;
+}
+#phone::-webkit-scrollbar{width:3px}
+#phone::-webkit-scrollbar-thumb{background:var(--color-tea-300);border-radius:3px}
+.phone-notch{
+  width:120px; height:6px; background:#d4b68a; border-radius:3px;
+  margin:8px auto 0; flex-shrink:0; position:sticky; top:0; z-index:5;
+}
+.phone-page{display:none; flex-direction:column; min-height:100%}
+.phone-page.active{display:flex}
+
+/* ── Controls Panel ── */
+#ctrl-panel{
+  width:340px; min-width:340px; height:100%;
+  background:var(--color-surface); border-left:1px solid var(--color-divider);
+  overflow-y:auto; overflow-x:hidden;
+  box-shadow:-2px 0 20px rgba(0,0,0,0.04);
+}
+#ctrl-panel::-webkit-scrollbar{width:4px}
+#ctrl-panel::-webkit-scrollbar-thumb{background:var(--color-tea-300);border-radius:4px}
+.ctrl-page{display:none; padding:12px 16px 80px}
+.ctrl-page.active{display:block}
+
+/* ── Control Section ── */
+.ctrl-section{margin-bottom:12px}
+.ctrl-section-header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:8px 0; cursor:pointer; user-select:none;
+  border-bottom:1px solid var(--color-divider); margin-bottom:8px;
+}
+.ctrl-section-header:hover{opacity:0.8}
+.ctrl-section-title{
+  font-family:var(--font-family-display); font-size:13px; font-weight:var(--font-weight-semibold);
+  color:var(--color-text-primary); display:flex; align-items:center; gap:6px;
+}
+.ctrl-section-arrow{font-size:10px;color:var(--color-text-hint);transition:transform var(--duration-fast)}
+.ctrl-section.collapsed .ctrl-section-arrow{transform:rotate(-90deg)}
+.ctrl-section-body{display:flex;flex-direction:column;gap:6px}
+.ctrl-section.collapsed .ctrl-section-body{display:none}
+
+/* ── Control Row ── */
+.ctrl-row{display:flex;align-items:center;gap:8px;padding:3px 0}
+.ctrl-label{flex-shrink:0;width:70px;font-size:11px;color:var(--color-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ctrl-row input[type=range]{flex:1;height:4px;-webkit-appearance:none;appearance:none;background:var(--color-tea-200);border-radius:2px;outline:none}
+.ctrl-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;background:var(--color-tea-500);border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.15)}
+.ctrl-val{flex-shrink:0;width:38px;text-align:right;font-size:10px;font-family:var(--font-family-receipt);color:var(--color-text-hint)}
+.ctrl-row input[type=color]{width:28px;height:28px;border:none;border-radius:var(--radius-sm);cursor:pointer;padding:0;background:none;flex-shrink:0}
+.ctrl-row input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.ctrl-row input[type=color]::-webkit-color-swatch{border:1px solid var(--color-border);border-radius:var(--radius-sm)}
+
+/* Color grid */
+.ctrl-color-grid{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0}
+.ctrl-color-swatch{width:28px;height:28px;border-radius:4px;border:1px solid var(--color-border);cursor:pointer;position:relative}
+.ctrl-color-swatch:hover{transform:scale(1.1);z-index:2;box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+
+/* ── Buttons ── */
+.btn-row{display:flex;gap:8px;padding:8px 0}
+.btn{flex:1;padding:6px 12px;border:1.5px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-surface);font-family:var(--font-family-body);font-size:12px;cursor:pointer;transition:all var(--duration-fast);text-align:center;color:var(--color-text-primary)}
+.btn:hover{background:var(--color-tea-100)}
+.btn--accent{background:var(--color-accent);color:#fff;border-color:var(--color-accent)}
+.btn--accent:hover{background:var(--color-accent-light)}
+
+/* ═══════════════════ Phone Content Styles ═══════════════════ */
+.phone-content{padding:12px;display:flex;flex-direction:column;gap:12px}
+
+/* Fake header */
+.fake-header{
+  display:flex;align-items:center;justify-content:space-between;
+  height:44px;padding:0 12px;background:var(--color-tea-50);flex-shrink:0;
+  border-bottom:1px solid var(--color-divider);
+}
+.fake-header__title{
+  font-family:var(--font-family-display);font-size:var(--text-md);
+  font-weight:var(--font-weight-semibold);color:var(--color-text-primary);
+}
+
+/* MonthHeader style */
+.fake-month-header{
+  display:flex;flex-direction:column;align-items:center;padding:24px 12px 12px;gap:8px;
+  flex-shrink:0;
+}
+.fake-month-header__title{
+  font-family:var(--font-family-display);font-size:var(--text-2xl);
+  font-weight:var(--font-weight-bold);color:var(--color-text-primary);
+}
+
+/* Weekday row */
+.weekday-row{
+  display:grid;grid-template-columns:repeat(7,1fr);text-align:center;
+  padding:8px 8px 0;font-family:var(--font-family-display);
+  font-size:var(--text-sm);font-weight:var(--font-weight-bold);
+  color:var(--color-text-primary);
+}
+
+/* Calendar wrapper */
+.calendar-wrap{
+  margin:0 12px;border:1.5px dashed var(--color-tea-300);
+  border-radius:var(--radius-lg);background:var(--color-surface);overflow:hidden;
+}
+
+/* Calendar grid */
+.cal-grid{
+  display:grid;grid-template-columns:repeat(7,1fr);
+  gap:var(--space-1);padding:8px;background:var(--color-surface);
+}
+
+/* DayCell */
+.day-cell-demo{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  aspect-ratio:1;min-height:40px;padding:2px;
+  border:1.5px solid transparent;border-radius:var(--radius-md);
+  background:var(--color-tea-50);cursor:pointer;
+  transition:background-color var(--duration-fast) var(--ease-default);
+}
+.day-cell-demo:hover{background:var(--color-tea-100);border-color:var(--color-tea-200)}
+.day-cell-demo--today{background:var(--color-tea-100)}
+.day-cell-demo--has-tea{justify-content:center}
+.day-cell-demo__date{
+  font-family:var(--font-family-display);font-size:var(--text-base);
+  font-weight:var(--font-weight-bold);color:var(--color-text-primary);
+  line-height:1;position:relative;width:24px;height:24px;
+  display:flex;align-items:center;justify-content:center;
+}
+.day-cell-demo__hand-circle{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;
+}
+.day-cell-demo__sticker{
+  width:100%;display:flex;align-items:center;justify-content:center;
+  filter:drop-shadow(1.5px 2px 3px rgba(47,31,18,0.22));
+  font-size:20px;opacity:0.4;
+}
+
+/* Mini tea thumb */
+.mini-tea{
+  width:32px;height:32px;border-radius:4px;background:var(--color-tea-200);
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+  filter:drop-shadow(0 0 5px rgba(255,255,255,0.9)) drop-shadow(1px 2px 3px rgba(47,31,18,0.15));
+}
+
+/* MonthlySummary card */
+.ms-card{
+  background:var(--color-surface);border-radius:var(--radius-lg);
+  border:1.5px dashed var(--color-tea-300);
+  padding:8px 12px;display:flex;flex-direction:column;gap:4px;
+  box-shadow:var(--shadow-sm);
+}
+.ms-top-row{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.ms-title{font-family:var(--font-family-display);font-size:var(--text-sm);font-weight:var(--font-weight-semibold);color:var(--color-text-primary);flex-shrink:0}
+.ms-photos{display:flex;gap:0;flex-shrink:0}
+.ms-photo{width:48px;height:48px;border-radius:4px;background:var(--color-tea-200);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;
+  filter:drop-shadow(0 0 5px rgba(255,255,255,0.9)) drop-shadow(1px 2px 3px rgba(47,31,18,0.15))}
+.ms-photo:not(:first-child){margin-left:-16px}
+.ms-amount{padding-top:4px;border-top:1px dashed var(--color-divider);font-family:var(--font-family-receipt);font-size:var(--text-xs);color:var(--color-text-hint);letter-spacing:0.04em}
+
+/* HistoricalFavorite */
+.hf-card{
+  background:var(--color-surface);border-radius:var(--radius-lg);
+  border:1.5px dashed var(--color-tea-300);
+  padding:12px 16px;box-shadow:var(--shadow-sm);
+}
+.hf-top-row{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.hf-title{font-family:var(--font-family-display);font-size:var(--text-sm);font-weight:var(--font-weight-semibold);color:var(--color-text-primary)}
+.hf-photos{display:flex;gap:0;flex-shrink:0}
+.hf-photo{width:48px;height:48px;border-radius:4px;background:var(--color-tea-200);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;
+  filter:drop-shadow(0 0 5px rgba(255,255,255,0.9)) drop-shadow(1px 2px 3px rgba(47,31,18,0.15))}
+.hf-photo:not(:first-child){margin-left:-16px}
+.hf-view-all{
+  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  padding:8px 0;margin-top:12px;border:none;border-top:1px solid var(--color-divider);
+  background:transparent;color:var(--color-text-secondary);
+  font-family:var(--font-family-body);font-size:var(--text-sm);cursor:pointer;
+}
+
+/* ReceiptCard */
+.rc-card{
+  max-width:var(--card-max-width);width:100%;margin:0 auto;
+  background:var(--color-surface);border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-md),0 0 0 1px rgba(47,31,18,0.04);
+  overflow:hidden;cursor:pointer;
+  transition:transform var(--duration-fast) var(--ease-bounce);
+}
+.rc-card:active{transform:scale(0.98)}
+.rc-body{padding:16px 20px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.rc-cutout-area{display:flex;align-items:center;justify-content:center;width:100%;margin-bottom:8px;position:relative}
+.rc-cutout-img{max-width:180px;max-height:180px;object-fit:contain;border-radius:var(--radius-sm);
+  filter:drop-shadow(0 0 5px rgba(255,255,255,0.95)) drop-shadow(2px 4px 12px rgba(47,31,18,0.2))}
+.rc-cutout-placeholder{width:140px;height:140px;border-radius:50%;background:linear-gradient(135deg,var(--color-tea-100),var(--color-tea-200));display:flex;align-items:center;justify-content:center;font-size:56px}
+.rc-fav-btn{
+  position:absolute;top:2px;left:2px;z-index:5;
+  display:flex;align-items:center;justify-content:center;
+  width:30px;height:30px;border:none;border-radius:var(--radius-full);
+  background:rgba(255,253,247,0.85);backdrop-filter:blur(4px);
+  color:var(--color-tea-400);cursor:pointer;font-size:14px;
+  box-shadow:0 1px 4px rgba(47,31,18,0.1);
+}
+.rc-name{font-family:var(--font-family-display);font-size:var(--text-lg);font-weight:var(--font-weight-semibold);color:var(--color-text-primary);text-align:center;line-height:1.4}
+.rc-brand{font-family:var(--font-family-receipt);font-size:var(--text-sm);color:var(--color-text-secondary);text-align:center}
+.rc-specs{font-family:var(--font-family-receipt);font-size:var(--text-sm);color:var(--color-text-secondary);text-align:center}
+.rc-toppings{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:4px}
+.rc-topping-tag{font-family:var(--font-family-body);font-size:var(--text-xs);font-weight:var(--font-weight-medium);color:var(--color-tea-700);background:var(--color-tea-100);border-radius:var(--radius-full);padding:2px 8px;line-height:1.4}
+.rc-stamps{display:flex;justify-content:center;gap:8px;margin-top:8px}
+.rc-stamp{width:28px;height:28px;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rc-stamp--filled{
+  background:var(--color-accent);color:#fff;
+  font-family:var(--font-family-stamp);font-size:14px;font-weight:var(--font-weight-bold);
+  transform:rotate(var(--stamp-rotation));
+  text-shadow:0 0 2px rgba(201,74,58,0.3),0 0 6px rgba(201,74,58,0.12);
+  box-shadow:inset 0 0 4px rgba(0,0,0,0.08);
+}
+.rc-stamp--empty{border:1.5px dashed var(--color-tea-300);background:transparent}
+.rc-price{font-family:var(--font-family-receipt);font-size:var(--text-2xl);font-weight:var(--font-weight-bold);color:var(--color-text-primary);text-align:center;margin:4px 0;letter-spacing:0.04em}
+.rc-divider{width:60%;border:none;border-top:1px dashed var(--color-divider);margin:8px 0}
+.rc-mood-row{display:flex;align-items:center;justify-content:center;gap:12px;width:100%}
+.rc-mood-text{font-family:var(--font-family-marker);font-size:var(--text-base);color:var(--color-text-secondary);text-align:center;line-height:1.5;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc-voice{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:var(--radius-full);background:var(--color-tea-100);color:var(--color-tea-500);flex-shrink:0;font-size:14px;border:none;cursor:pointer}
+.rc-date{font-family:var(--font-family-body);font-size:var(--text-sm);color:var(--color-text-hint);text-align:center}
+
+/* ── Step4 Info Form ── */
+.info-form{display:flex;flex-direction:column;gap:12px;padding:0}
+.info-field{display:flex;flex-direction:column;gap:6px}
+.info-label{font-family:var(--font-family-body);font-size:var(--text-sm);font-weight:var(--font-weight-medium);color:var(--color-text-secondary)}
+.info-input{width:100%;height:48px;padding:0 16px;border:1.5px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-surface);font-family:var(--font-family-body);font-size:var(--text-base);color:var(--color-text-primary);outline:none}
+.info-input:focus{border-color:var(--color-tea-500);box-shadow:0 0 0 3px rgba(139,107,74,0.12)}
+.info-input::placeholder{color:var(--color-text-hint)}
+.info-select-box{width:100%;height:48px;padding:0 16px;border:1.5px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-surface);font-family:var(--font-family-body);font-size:var(--text-base);color:var(--color-text-primary);cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.info-select-box--filled{border-color:var(--color-tea-400);background:var(--color-tea-50)}
+.info-topping-grid{display:flex;flex-wrap:wrap;gap:8px}
+.info-topping-tag{padding:4px 12px;border:1.5px solid var(--color-tea-200);border-radius:var(--radius-full);background:var(--color-tea-50);color:var(--color-tea-600);font-family:var(--font-family-body);font-size:var(--text-xs);cursor:pointer;transition:all var(--duration-fast)}
+.info-topping-tag--selected{background:var(--color-tea-500);color:var(--color-text-inverse);border-color:var(--color-tea-500)}
+.info-stamp-row{display:flex;gap:12px;align-items:center}
+.info-stamp-demo{width:44px;height:44px;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--duration-fast)}
+.info-stamp-demo--empty{border:2px dashed var(--color-tea-300);background:transparent}
+.info-stamp-demo--filled{background:var(--color-accent);border:2px solid var(--color-accent);color:var(--color-text-inverse);font-family:var(--font-family-stamp);font-size:24px;font-weight:var(--font-weight-bold);transform:rotate(var(--stamp-rotation));box-shadow:0 0 8px var(--color-accent-glow)}
+.info-cutout-preview{display:flex;align-items:center;justify-content:center;width:100%;height:100px;background:var(--color-tea-50);border-radius:var(--radius-md);border:1.5px dashed var(--color-tea-200);margin:8px 0}
+.info-price-row{display:flex;align-items:center;gap:0}
+.info-price-unit{font-family:var(--font-family-receipt);font-size:var(--text-lg);font-weight:var(--font-weight-bold);color:var(--color-text-secondary);padding:0 12px;flex-shrink:0}
+
+/* ── Tear Overlay ── */
+.tear-preview{position:relative;background:rgba(251,245,237,0.94);display:flex;align-items:center;justify-content:center;flex-direction:column;flex:1;gap:16px;padding:40px 20px}
+.tear-receipt{width:280px;background:var(--color-surface);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 8px 32px rgba(47,31,18,0.2);padding:20px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.tear-receipt-cutout{display:flex;align-items:center;justify-content:center;width:100%;margin-bottom:8px}
+.tear-receipt-cutout-placeholder{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,var(--color-tea-100),var(--color-tea-200));display:flex;align-items:center;justify-content:center;font-size:40px}
+.tear-receipt-name{font-family:var(--font-family-display);font-size:var(--text-lg);font-weight:var(--font-weight-bold);color:var(--color-text-primary)}
+.tear-receipt-brand{font-family:var(--font-family-display);font-size:var(--text-sm);color:var(--color-text-secondary)}
+.tear-receipt-meta{font-size:var(--text-xs);color:var(--color-text-hint)}
+.tear-receipt-price{font-family:var(--font-family-receipt);font-size:var(--text-lg);font-weight:var(--font-weight-bold);color:var(--color-accent);margin-top:8px}
+.tear-receipt-mood{font-family:var(--font-family-marker);font-size:var(--text-sm);color:var(--color-text-secondary);font-style:italic;text-align:center;margin-top:8px}
+.tear-hint{font-family:var(--font-family-display);font-size:var(--text-sm);color:var(--color-text-secondary);text-align:center;animation:hint-pulse 2s ease-in-out infinite}
+@keyframes hint-pulse{0%,100%{opacity:0.5;transform:translateY(0)}50%{opacity:1;transform:translateY(5px)}}
+.tear-tear-line{width:340px;height:20px;position:relative}
+.tear-tear-line::before{content:'';position:absolute;top:50%;left:-10px;right:-10px;border-top:2px dashed var(--color-tea-400)}
+
+/* ── Bottom Nav ── */
+.fake-bottom-nav{
+  display:flex;align-items:center;height:60px;background:var(--color-surface);
+  border-top:1px solid var(--color-divider);
+  box-shadow:0 -2px 12px rgba(47,31,18,0.06);flex-shrink:0;margin-top:auto;
+  position:sticky;bottom:0;
+}
+.fake-nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--color-tea-700);font-family:var(--font-family-body);font-size:var(--text-xs);font-weight:var(--font-weight-medium)}
+.fake-nav-tab-icon{font-size:20px}
+.fake-nav-fab-wrap{flex:1;display:flex;align-items:center;justify-content:center;position:relative;height:100%}
+.fake-nav-fab{
+  position:absolute;bottom:calc(50% - 4px);left:50%;transform:translateX(-50%);
+  width:56px;height:56px;border-radius:50%;background:var(--color-accent);color:#fff;
+  box-shadow:var(--shadow-glow),0 4px 12px rgba(201,74,58,0.35);
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ Tab Bar ═══════════════════ -->
+<div id="tab-bar">
+  <button class="tab-btn" data-tab="global"><span class="tab-emoji">🎨</span><span class="tab-label">全局变量</span></button>
+  <button class="tab-btn" data-tab="calendar"><span class="tab-emoji">📅</span><span class="tab-label">日历页</span></button>
+  <button class="tab-btn" data-tab="monthly"><span class="tab-emoji">📊</span><span class="tab-label">本月累计</span></button>
+  <button class="tab-btn" data-tab="favorite"><span class="tab-emoji">🏆</span><span class="tab-label">本月最爱</span></button>
+  <button class="tab-btn" data-tab="receipt"><span class="tab-emoji">🧾</span><span class="tab-label">小票卡片</span></button>
+  <button class="tab-btn" data-tab="infoform"><span class="tab-emoji">✍️</span><span class="tab-label">填写页</span></button>
+  <button class="tab-btn" data-tab="tear"><span class="tab-emoji">🎬</span><span class="tab-label">撕小票</span></button>
+</div>
+
+<!-- ═══════════════════ Main Area ═══════════════════ -->
+<div id="main-area">
+
+<!-- ── Phone Mockup ── -->
+<div id="phone-wrap">
+<div id="phone">
+  <div class="phone-notch"></div>
+
+  <!-- 📅 日历页 -->
+  <div class="phone-page" id="page-calendar">
+    <div class="fake-month-header">
+      <div class="fake-month-header__title">2026年6月</div>
+      <div style="font-family:var(--font-family-display);font-size:var(--text-sm);color:var(--color-accent)">今天 24日 · 收集盒 📦 3</div>
+    </div>
+    <div class="weekday-row"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
+    <div class="calendar-wrap">
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+    <div class="phone-content">
+      <div class="ms-card">
+        <div class="ms-top-row">
+          <span class="ms-title">6月 · 12杯 · 5家店</span>
+          <div class="ms-photos"><span class="ms-photo">🧋</span><span class="ms-photo">🍵</span><span class="ms-photo">🫖</span><span class="ms-photo">🧋</span><span class="ms-photo">🍵</span></div>
+        </div>
+        <div class="ms-amount">¥186.00</div>
+      </div>
+    </div>
+    <div class="fake-bottom-nav">
+      <div class="fake-nav-tab"><span class="fake-nav-tab-icon">📅</span>日历</div>
+      <div class="fake-nav-fab-wrap"><div class="fake-nav-fab">🧋</div></div>
+    </div>
+  </div>
+
+  <!-- 📊 本月累计 -->
+  <div class="phone-page" id="page-monthly">
+    <div class="fake-header"><span class="fake-header__title">← 返回</span></div>
+    <div class="phone-content" style="padding:24px 16px">
+      <div class="ms-card" id="ms-card-demo">
+        <div class="ms-top-row">
+          <span class="ms-title">6月 · 12杯 · 5家店</span>
+          <div class="ms-photos"><span class="ms-photo">🧋</span><span class="ms-photo">🍵</span><span class="ms-photo">🫖</span><span class="ms-photo">🧋</span><span class="ms-photo">🍵</span></div>
+        </div>
+        <div class="ms-amount">¥186.00</div>
+      </div>
+      <div style="font-family:var(--font-family-display);font-size:var(--text-sm);color:var(--color-text-hint);text-align:center;margin-top:16px">📊 虚线边框 · 照片墙 · 左标题右图片 · 金额小字</div>
+    </div>
+  </div>
+
+  <!-- 🏆 本月最爱 -->
+  <div class="phone-page" id="page-favorite">
+    <div class="fake-header"><span class="fake-header__title">← 返回</span></div>
+    <div class="phone-content" style="padding:24px 16px">
+      <div class="hf-card" id="hf-card-demo">
+        <div class="hf-top-row">
+          <div>
+            <span class="hf-title">本月最爱</span>
+            <div style="font-family:var(--font-family-display);font-size:var(--text-base);color:var(--color-text-primary);margin-top:4px">多肉葡萄</div>
+            <div style="font-family:var(--font-family-body);font-size:var(--text-xs);color:var(--color-text-hint)">×3杯</div>
+          </div>
+          <div class="hf-photos"><span class="hf-photo">🧋</span><span class="hf-photo">🧋</span></div>
+        </div>
+        <button class="hf-view-all">查看历史最爱 →</button>
+      </div>
+      <div style="font-family:var(--font-family-display);font-size:var(--text-sm);color:var(--color-text-hint);text-align:center;margin-top:16px">🏆 虚线缝线 · 本月最爱 · 查看历史</div>
+    </div>
+  </div>
+
+  <!-- 🧾 小票卡片 -->
+  <div class="phone-page" id="page-receipt">
+    <div class="fake-header"><span class="fake-header__title">小票存根</span></div>
+    <div class="phone-content" style="padding:16px;align-items:center">
+      <div class="rc-card" id="rc-card-demo">
+        <div class="rc-body">
+          <div class="rc-cutout-area">
+            <div class="rc-cutout-placeholder" id="rc-cutout-demo">🧋</div>
+            <button class="rc-fav-btn" id="rc-fav-demo">♡</button>
+          </div>
+          <div class="rc-name">多肉葡萄</div>
+          <div class="rc-brand">喜茶 · 万象城店</div>
+          <div class="rc-specs">大杯 · 少冰 · 半糖</div>
+          <div class="rc-toppings"><span class="rc-topping-tag">+珍珠</span><span class="rc-topping-tag">+脆波波</span></div>
+          <div class="rc-stamps" id="rc-stamps-demo"></div>
+          <div class="rc-price">¥18.00</div>
+          <hr class="rc-divider">
+          <div class="rc-mood-row">
+            <span class="rc-mood-text">"今天超开心！珍珠很Q弹~"</span>
+            <button class="rc-voice">🔊</button>
+          </div>
+          <div class="rc-date">2026.06.24</div>
+        </div>
+      </div>
+      <div style="font-family:var(--font-family-display);font-size:var(--text-sm);color:var(--color-text-hint);text-align:center;margin-top:8px">🧾 点击印章动态盖下 · 收藏按钮 · 语音播放</div>
+    </div>
+  </div>
+
+  <!-- ✍️ 填写页 -->
+  <div class="phone-page" id="page-infoform">
+    <div class="fake-header"><span class="fake-header__title">填写信息 · Step 4/6</span></div>
+    <div class="phone-content" style="padding:12px 16px">
+      <div class="info-cutout-preview">🧋 奶茶抠图预览区</div>
+      <div class="info-form">
+        <div class="info-field">
+          <span class="info-label">奶茶名称 *</span>
+          <input class="info-input" placeholder="输入饮品名..." value="多肉葡萄">
+        </div>
+        <div class="info-field">
+          <span class="info-label">品牌</span>
+          <div class="info-select-box info-select-box--filled"><span>喜茶</span><span>▼</span></div>
+        </div>
+        <div class="info-field">
+          <span class="info-label">杯型</span>
+          <div style="display:flex;gap:8px">
+            <div class="info-select-box" style="flex:1;justify-content:center;height:44px;font-size:var(--text-sm)">中杯</div>
+            <div class="info-select-box info-select-box--filled" style="flex:1;justify-content:center;height:44px;font-size:var(--text-sm)">大杯</div>
+            <div class="info-select-box" style="flex:1;justify-content:center;height:44px;font-size:var(--text-sm)">超大杯</div>
+          </div>
+        </div>
+        <div class="info-field">
+          <span class="info-label">小料</span>
+          <div class="info-topping-grid">
+            <span class="info-topping-tag info-topping-tag--selected">珍珠</span>
+            <span class="info-topping-tag">椰果</span>
+            <span class="info-topping-tag info-topping-tag--selected">脆波波</span>
+            <span class="info-topping-tag">奶盖</span>
+            <span class="info-topping-tag">芋泥</span>
+            <span class="info-topping-tag">布丁</span>
+          </div>
+        </div>
+        <div class="info-field">
+          <span class="info-label">评分</span>
+          <div class="info-stamp-row" id="info-stamps-demo"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🎬 撕小票 -->
+  <div class="phone-page" id="page-tear">
+      <div class="tear-preview">
+        <div class="tear-hint">👇 向下滑动撕下小票</div>
+        <div class="tear-tear-line"></div>
+        <div class="tear-receipt" id="tear-receipt-demo">
+          <div class="tear-receipt-cutout"><div class="tear-receipt-cutout-placeholder">🧋</div></div>
+          <div class="tear-receipt-name">多肉葡萄</div>
+          <div class="tear-receipt-brand">喜茶 · 万象城店</div>
+          <div class="tear-receipt-meta">大杯 · 少冰 · 半糖</div>
+          <div class="tear-receipt-price">¥18.00</div>
+          <div class="tear-receipt-mood">"今天超开心！珍珠很Q弹~"</div>
+        </div>
+      </div>
+  </div>
+
+  <!-- 🎨 全局变量 -->
+  <div class="phone-page" id="page-global">
+    <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:var(--font-family-display);font-size:var(--text-lg);font-weight:var(--font-weight-bold);color:var(--color-text-primary);text-align:center">🎨 全局变量预览</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px" id="global-swatches"></div>
+      <div style="font-family:var(--font-family-display);font-size:var(--text-2xl);font-weight:var(--font-weight-bold);color:var(--color-text-primary)">标题 Display</div>
+      <div style="font-family:var(--font-family-body);font-size:var(--text-base);color:var(--color-text-secondary)">正文 Body — 这里展示正文字体效果</div>
+      <div style="font-family:var(--font-family-receipt);font-size:var(--text-sm);color:var(--color-text-secondary)">小票 Receipt — 等宽打字机字体</div>
+      <div style="font-family:var(--font-family-stamp);font-size:24px;color:var(--color-accent);transform:rotate(var(--stamp-rotation));text-shadow:0 0 2px rgba(201,74,58,0.3)">印章 Stamp</div>
+      <div style="font-family:var(--font-family-marker);font-size:var(--text-base);color:var(--color-text-secondary)">手写 Marker — 心情批注</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button style="padding:8px 24px;border:none;border-radius:var(--radius-full);background:var(--color-accent);color:#fff;font-family:var(--font-family-body);font-size:var(--text-base);cursor:pointer">主要按钮</button>
+        <button style="padding:8px 24px;border:1.5px solid var(--color-border);border-radius:var(--radius-full);background:transparent;color:var(--color-text-primary);font-family:var(--font-family-body);font-size:var(--text-base);cursor:pointer">次要按钮</button>
+      </div>
+      <div style="margin-top:8px;font-family:var(--font-family-body);font-size:var(--text-xs);color:var(--color-text-hint)">当前 CSS 变量实时反映在左侧控件的调整</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ── Controls Panel ── -->
+<div id="ctrl-panel">
+
+<!-- 🎨 全局变量控件 -->
+<div class="ctrl-page" id="ctrl-global"></div>
+
+<!-- 📅 日历页控件 -->
+<div class="ctrl-page" id="ctrl-calendar"></div>
+
+<!-- 📊 本月累计控件 -->
+<div class="ctrl-page" id="ctrl-monthly"></div>
+
+<!-- 🏆 本月最爱控件 -->
+<div class="ctrl-page" id="ctrl-favorite"></div>
+
+<!-- 🧾 小票卡片控件 -->
+<div class="ctrl-page" id="ctrl-receipt"></div>
+
+<!-- ✍️ 填写页控件 -->
+<div class="ctrl-page" id="ctrl-infoform"></div>
+
+<!-- 🎬 撕小票控件 -->
+<div class="ctrl-page" id="ctrl-tear"></div>
+
+</div><!-- /ctrl-panel -->
+</div><!-- /main-area -->
+
+<script>
+/* ═══════════════════════════════════════════════════
+   Design System Playground — JavaScript
+   ═══════════════════════════════════════════════════ */
+
+const DEFAULTS = {};
+(function captureDefaults(){
+  const rs = getComputedStyle(document.documentElement);
+  const vars = [
+    '--tea-50','--tea-100','--tea-200','--tea-300','--tea-400','--tea-500','--tea-600','--tea-700','--tea-800','--tea-900',
+    '--accent','--accent-light','--accent-dark','--accent-glow',
+    '--success','--warning','--error','--info',
+    '--color-surface','--color-border','--color-divider',
+    '--color-text-primary','--color-text-secondary','--color-text-hint','--color-text-inverse',
+    '--text-xs','--text-sm','--text-base','--text-md','--text-lg','--text-xl','--text-2xl','--text-3xl',
+    '--space-1','--space-2','--space-3','--space-4','--space-5','--space-6','--space-8','--space-10','--space-12','--space-16',
+    '--radius-sm','--radius-md','--radius-lg','--radius-xl','--radius-full',
+    '--stamp-rotation','--stamp-blur','--card-max-width','--noise-opacity',
+    '--shadow-sm','--shadow-md','--shadow-lg','--shadow-glow',
+    '--duration-instant','--duration-fast','--duration-normal','--duration-slow','--duration-tear','--duration-stamp','--duration-fly'
+  ];
+  vars.forEach(v => { DEFAULTS[v] = rs.getPropertyValue(v).trim(); });
+})();
+
+const $ = (s)=>document.querySelector(s);
+const $$ = (s)=>document.querySelectorAll(s);
+
+/* ── Helpers ── */
+function setVar(name, value){ document.documentElement.style.setProperty(name, value); }
+function getVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
+/* ── Build slider row ── */
+function sliderRow(label, varName, min, max, step, unit=''){
+  const row = document.createElement('div'); row.className='ctrl-row';
+  const lbl = document.createElement('span'); lbl.className='ctrl-label'; lbl.textContent=label;
+  const inp = document.createElement('input'); inp.type='range'; inp.min=min; inp.max=max; inp.step=step;
+  inp.value = parseFloat(getVar(varName));
+  inp.addEventListener('input', ()=>{
+    setVar(varName, inp.value + unit);
+    valEl.textContent = inp.value + unit;
+    afterUpdate(varName);
+  });
+  const valEl = document.createElement('span'); valEl.className='ctrl-val'; valEl.textContent=inp.value+unit;
+  row.append(lbl, inp, valEl);
+  return row;
+}
+
+/* ── Build color row ── */
+function colorRow(label, varName){
+  const row = document.createElement('div'); row.className='ctrl-row';
+  const lbl = document.createElement('span'); lbl.className='ctrl-label'; lbl.textContent=label;
+  const inp = document.createElement('input'); inp.type='color';
+  inp.value = getVar(varName);
+  inp.addEventListener('input', ()=>{
+    setVar(varName, inp.value);
+    syncAliases(varName);
+    afterUpdate(varName);
+  });
+  const hex = document.createElement('span'); hex.className='ctrl-val'; hex.style.width='60px'; hex.textContent=inp.value;
+  inp.addEventListener('input', ()=>{ hex.textContent = inp.value; });
+  row.append(lbl, inp, hex);
+  return row;
+}
+
+/* ── Sync --color-xxx aliases ── */
+const ALIAS_MAP = {
+  '--tea-50':'--color-tea-50','--tea-100':'--color-tea-100','--tea-200':'--color-tea-200',
+  '--tea-300':'--color-tea-300','--tea-400':'--color-tea-400','--tea-500':'--color-tea-500',
+  '--tea-600':'--color-tea-600','--tea-700':'--color-tea-700','--tea-800':'--color-tea-800','--tea-900':'--color-tea-900',
+  '--accent':'--color-accent','--accent-light':'--color-accent-light','--accent-dark':'--color-accent-dark',
+  '--accent-glow':'--color-accent-glow','--success':'--color-success','--warning':'--color-warning',
+  '--error':'--color-error','--info':'--color-info',
+};
+function syncAliases(varName){
+  if(ALIAS_MAP[varName]) setVar(ALIAS_MAP[varName], getVar(varName));
+  // spacing aliases
+  if(varName.startsWith('--space-')) setVar('--spacing'+varName.slice(6), getVar(varName));
+}
+
+/* ── Build section ── */
+function buildSection(container, title, emoji, collapsed=false){
+  const sec = document.createElement('div'); sec.className='ctrl-section' + (collapsed?' collapsed':'');
+  const hdr = document.createElement('div'); hdr.className='ctrl-section-header';
+  hdr.innerHTML = `<span class="ctrl-section-title">${emoji} ${title}</span><span class="ctrl-section-arrow">▼</span>`;
+  hdr.addEventListener('click', ()=>{ sec.classList.toggle('collapsed'); });
+  const body = document.createElement('div'); body.className='ctrl-section-body';
+  sec.append(hdr, body);
+  container.appendChild(sec);
+  return body;
+}
+
+/* ── Hook after param change ── */
+function afterUpdate(varName){
+  if(varName.startsWith('--tea-') || varName.startsWith('--accent') || varName === '--success' || varName === '--warning' || varName === '--error' || varName === '--info' || varName === '--color-surface' || varName === '--color-border'){
+    buildGlobalSwatches();
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   Tab Switching
+   ═══════════════════════════════════════════════════ */
+function switchTab(tabName){
+  $$('.tab-btn').forEach(b=>b.classList.remove('active'));
+  $(`.tab-btn[data-tab="${tabName}"]`).classList.add('active');
+  $$('.phone-page').forEach(p=>p.classList.remove('active'));
+  $$('.ctrl-page').forEach(p=>p.classList.remove('active'));
+  const phonePage = $('#page-'+tabName);
+  const ctrlPage = $('#ctrl-'+tabName);
+  if(phonePage) phonePage.classList.add('active');
+  if(ctrlPage) ctrlPage.classList.add('active');
+}
+
+$$('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    switchTab(btn.dataset.tab);
+  });
+});
+
+/* ═══════════════════════════════════════════════════
+   After-update hooks for specific components
+   ═══════════════════════════════════════════════════ */
+const origAfterUpdate = afterUpdate;
+afterUpdate = function(varName){
+  origAfterUpdate(varName);
+  if(['--stamp-rotation','--stamp-blur'].includes(varName)) rebuildStamps();
+};
+
+/* ── Global swatches ── */
+function buildGlobalSwatches(){
+  const container = $('#global-swatches');
+  if(!container) return;
+  const teaVars = ['--tea-50','--tea-100','--tea-200','--tea-300','--tea-400','--tea-500','--tea-600','--tea-700','--tea-800','--tea-900'];
+  const otherVars = ['--accent','--accent-light','--accent-dark','--success','--warning','--error','--info','--color-surface','--color-border','--color-divider'];
+  let html = '';
+  [...teaVars, ...otherVars].forEach(v=>{
+    const c = getVar(v);
+    html += `<div style="width:32px;height:32px;background:${c};border-radius:4px;border:1px solid var(--color-border);flex-shrink:0" title="${v}: ${c}"></div>`;
+  });
+  container.innerHTML = html;
+}
+
+/* ── Build calendar grid ── */
+function buildCalendarGrid(){
+  const grid = $('#cal-grid');
+  if(!grid) return;
+  const daysInMonth = 30;
+  let html = '';
+  // Empty cells for first day (Monday = 1, so 1 empty for Sunday)
+  for(let i=0;i<1;i++) html += '<div style="min-height:40px"></div>';
+  for(let d=1;d<=daysInMonth;d++){
+    const isToday = d===24;
+    const hasTea = [3,5,10,12,15,17,18,22,24,27,28,29].includes(d);
+    const cls = 'day-cell-demo' + (isToday?' day-cell-demo--today':'') + (hasTea?' day-cell-demo--has-tea':'');
+    html += `<div class="${cls}">`;
+    html += `<span class="day-cell-demo__date">${d}`;
+    if(isToday){
+      html += `<svg class="day-cell-demo__hand-circle" width="28" height="28" viewBox="0 0 28 28"><ellipse cx="14" cy="14" rx="12" ry="10.5" fill="none" stroke="${getVar('--accent')}" stroke-width="1.8" stroke-dasharray="48 2 44 3 48 1" transform="rotate(-7 14 14)" opacity="0.65"/></svg>`;
+    }
+    html += `</span>`;
+    if(hasTea) html += `<div class="day-cell-demo__sticker"><span class="mini-tea">🧋</span></div>`;
+    html += `</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+/* ── Build stamps ── */
+function rebuildStamps(){
+  // Receipt card stamps
+  const rcStamps = $('#rc-stamps-demo');
+  if(rcStamps){
+    let h = '';
+    for(let i=0;i<5;i++){
+      h += `<div class="rc-stamp ${i<4?'rc-stamp--filled':'rc-stamp--empty'}">${i<4?'★':''}</div>`;
+    }
+    rcStamps.innerHTML = h;
+  }
+  // Info form stamps
+  const infoStamps = $('#info-stamps-demo');
+  if(infoStamps){
+    let h = '';
+    for(let i=0;i<5;i++){
+      h += `<div class="info-stamp-demo ${i<4?'info-stamp-demo--filled':'info-stamp-demo--empty'}" style="${i<4?'':'cursor:pointer'}">${i<4?'★':''}</div>`;
+    }
+    infoStamps.innerHTML = h;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   Build Control Panels
+   ═══════════════════════════════════════════════════ */
+
+/* ── 🎨 全局变量 ── */
+(function buildGlobalCtrls(){
+  const c = $('#ctrl-global');
+  c.innerHTML = '';
+
+  // Colors
+  let sec = buildSection(c, '奶茶棕色系', '🎨');
+  const teaGrid = document.createElement('div'); teaGrid.className='ctrl-color-grid';
+  const teaNames = ['50','100','200','300','400','500','600','700','800','900'];
+  teaNames.forEach(t=>{
+    const sw = document.createElement('div'); sw.className='ctrl-color-swatch';
+    const vn = '--tea-'+t;
+    sw.style.background = getVar(vn);
+    sw.title = vn;
+    const input = document.createElement('input'); input.type='color'; input.style.cssText='position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%';
+    input.value = getVar(vn);
+    input.addEventListener('input', ()=>{
+      setVar(vn, input.value);
+      syncAliases(vn);
+      sw.style.background = input.value;
+      buildGlobalSwatches();
+      buildCalendarGrid();
+    });
+    sw.appendChild(input);
+    sw.addEventListener('mouseenter', ()=>{
+      const existing = sw.querySelector('.sw-label');
+      if(!existing){
+        const lbl = document.createElement('span');
+        lbl.className='sw-label';
+        lbl.style.cssText='position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--color-text-hint);white-space:nowrap;pointer-events:none';
+        lbl.textContent = vn;
+        sw.appendChild(lbl);
+      }
+    });
+    sw.addEventListener('mouseleave', ()=>{
+      const lbl = sw.querySelector('.sw-label');
+      if(lbl) lbl.remove();
+    });
+    teaGrid.appendChild(sw);
+  });
+  sec.appendChild(teaGrid);
+
+  sec = buildSection(c, '印章红 & 语义色', '🔴');
+  ['--accent','--accent-light','--accent-dark','--success','--warning','--error','--info'].forEach(vn=>{
+    sec.appendChild(colorRow(vn.replace('--',''), vn));
+  });
+
+  sec = buildSection(c, '中性色', '📄');
+  ['--color-surface','--color-border','--color-divider','--color-text-primary','--color-text-secondary','--color-text-hint'].forEach(vn=>{
+    sec.appendChild(colorRow(vn.replace('--color-',''), vn));
+  });
+
+  // Typography
+  sec = buildSection(c, '字号阶梯', '🔤');
+  ['--text-xs','--text-sm','--text-base','--text-md','--text-lg','--text-xl','--text-2xl','--text-3xl'].forEach(vn=>{
+    sec.appendChild(sliderRow(vn.replace('--text-',''), vn, 6, 80, 1, 'px'));
+  });
+
+  // Spacing
+  sec = buildSection(c, '间距系统 (4px基准)', '📏');
+  ['--space-1','--space-2','--space-3','--space-4','--space-5','--space-6','--space-8','--space-10','--space-12','--space-16'].forEach(vn=>{
+    sec.appendChild(sliderRow(vn.replace('--',''), vn, 0, 140, 1, 'px'));
+  });
+
+  // Radii
+  sec = buildSection(c, '圆角', '⭕');
+  ['--radius-sm','--radius-md','--radius-lg','--radius-xl'].forEach(vn=>{
+    sec.appendChild(sliderRow(vn.replace('--radius-',''), vn, 0, 40, 1, 'px'));
+  });
+
+  // Shadows
+  sec = buildSection(c, '阴影', '🌑');
+  ['--shadow-sm','--shadow-md','--shadow-lg','--shadow-glow'].forEach(vn=>{
+    const row = document.createElement('div'); row.className='ctrl-row';
+    const lbl = document.createElement('span'); lbl.className='ctrl-label'; lbl.textContent=vn.replace('--shadow-','');
+    const inp = document.createElement('input'); inp.type='text'; inp.style.cssText='flex:1;border:1px solid var(--color-border);border-radius:4px;padding:2px 6px;font-size:10px;font-family:monospace;background:var(--color-surface);color:var(--color-text-primary)';
+    inp.value = getVar(vn);
+    inp.addEventListener('change', ()=>{ setVar(vn, inp.value); });
+    row.append(lbl, inp);
+    sec.appendChild(row);
+  });
+
+  // Durations
+  sec = buildSection(c, '动效时长', '⏱️');
+  ['--duration-instant','--duration-fast','--duration-normal','--duration-slow','--duration-tear','--duration-stamp','--duration-fly'].forEach(vn=>{
+    sec.appendChild(sliderRow(vn.replace('--duration-',''), vn, 20, 2000, 10, 'ms'));
+  });
+
+  // Special
+  sec = buildSection(c, '特殊参数', '🪄');
+  sec.appendChild(sliderRow('噪点透明度', '--noise-opacity', 0, 0.2, 0.005, ''));
+  sec.appendChild(sliderRow('印章旋转', '--stamp-rotation', -15, 15, 0.5, 'deg'));
+  sec.appendChild(sliderRow('印章模糊', '--stamp-blur', 0, 8, 0.5, 'px'));
+  sec.appendChild(sliderRow('卡片最大宽', '--card-max-width', 200, 500, 4, 'px'));
+
+  // Actions
+  const btnRow = document.createElement('div'); btnRow.className='btn-row'; btnRow.style.cssText='margin-top:12px';
+  btnRow.innerHTML = '<button class="btn" id="btn-copy-css">📋 导出CSS</button><button class="btn btn--accent" id="btn-reset-all">↺ 全部重置</button>';
+  c.appendChild(btnRow);
+
+  $('#btn-copy-css').addEventListener('click', exportCSS);
+  $('#btn-reset-all').addEventListener('click', resetAll);
+})();
+
+/* ── 📅 日历页 ── */
+(function buildCalendarCtrls(){
+  const c = $('#ctrl-calendar');
+  c.innerHTML = '<div style="font-family:var(--font-family-display);font-size:var(--text-sm);color:var(--color-text-secondary);padding:12px 0;text-align:center">调整参数实时反映在左侧日历预览中</div>';
+
+  let sec = buildSection(c, '日历格样式', '📅');
+  sec.appendChild(sliderRow('圆角', '--radius-md', 0, 20, 1, 'px'));
+
+  sec = buildSection(c, '今日标记', '🔴');
+  sec.appendChild(colorRow('强调色', '--accent'));
+
+  sec = buildSection(c, '日历框虚线', '🔲');
+  sec.appendChild(colorRow('虚线颜色', '--tea-300'));
+  sec.appendChild(sliderRow('虚线圆角', '--radius-lg', 0, 24, 1, 'px'));
+
+  sec = buildSection(c, '间距', '📏');
+  sec.appendChild(sliderRow('日历格间距', '--space-1', 0, 16, 1, 'px'));
+
+  const btnRow = document.createElement('div'); btnRow.className='btn-row'; btnRow.style.cssText='margin-top:12px';
+  btnRow.innerHTML = '<button class="btn btn--accent" id="btn-reset-cal">↺ 重置日历</button>';
+  c.appendChild(btnRow);
+})();
+
+/* ── 📊 本月累计 ── */
+(function buildMonthlyCtrls(){
+  const c = $('#ctrl-monthly');
+  c.innerHTML = '<div style="font-family:var(--font-family-display);font-size:var(--text-sm);color:var(--color-text-secondary);padding:12px 0;text-align:center">调整本月累计卡片的各项参数</div>';
+
+  let sec = buildSection(c, '卡片样式', '📊');
+  sec.appendChild(colorRow('卡片背景', '--color-surface'));
+  sec.appendChild(sliderRow('卡片圆角', '--radius-lg', 0, 24, 1, 'px'));
+  sec.appendChild(colorRow('虚线颜色', '--tea-300'));
+
+  sec = buildSection(c, '标题文字', '📝');
+  sec.appendChild(sliderRow('标题字号', '--text-sm', 8, 28, 1, 'px'));
+
+  sec = buildSection(c, '照片墙', '🖼️');
+  sec.appendChild(sliderRow('照片尺寸', '--ms-photo-size', 28, 96, 4, 'px'));
+
+  sec = buildSection(c, '金额', '💰');
+  sec.appendChild(sliderRow('金额字号', '--text-xs', 8, 20, 1, 'px'));
+  sec.appendChild(colorRow('金额颜色', '--color-text-hint'));
+
+  sec = buildSection(c, '阴影', '🌑');
+  sec.appendChild(colorRow('阴影颜色', '--tea-800'));
+
+  // Note: --ms-photo-size is a custom var we inject
+  setVar('--ms-photo-size', '48');
+  const msPhotoStyle = document.createElement('style'); msPhotoStyle.id='ms-photo-style';
+  msPhotoStyle.textContent = `.ms-photo{width:var(--ms-photo-size)!important;height:var(--ms-photo-size)!important}`;
+  document.head.appendChild(msPhotoStyle);
+  // Hook after update for --ms-photo-size
+  const origAfter2 = afterUpdate;
+  afterUpdate = function(vn){
+    origAfter2(vn);
+    if(vn==='--ms-photo-size'){
+      document.querySelectorAll('.ms-photo').forEach(el=>{el.style.width=getVar('--ms-photo-size');el.style.height=getVar('--ms-photo-size')});
+    }
+  };
+})();
+
+/* ── 🏆 本月最爱 ── */
+(function buildFavoriteCtrls(){
+  const c = $('#ctrl-favorite');
+  c.innerHTML = '<div style="font-family:var(--font-family-display);font-size:var(--text-sm);color:var(--color-text-secondary);padding:12px 0;text-align:center">调整本月最爱卡片的各项参数</div>';
+
+  let sec = buildSection(c, '卡片样式', '🏆');
+  sec.appendChild(colorRow('卡片背景', '--color-surface'));
+  sec.appendChild(sliderRow('卡片圆角', '--radius-lg', 0, 24, 1, 'px'));
+  sec.appendChild(colorRow('虚线颜色', '--tea-300'));
+
+  sec = buildSection(c, '标题', '📝');
+  sec.appendChild(sliderRow('标题字号', '--text-sm', 8, 28, 1, 'px'));
+
+  sec = buildSection(c, '照片墙', '🖼️');
+  sec.appendChild(sliderRow('照片尺寸', '--hf-photo-size', 28, 96, 4, 'px'));
+  // Apply custom var
+  setVar('--hf-photo-size', '48');
+  const hfStyle = document.createElement('style'); hfStyle.id='hf-photo-style';
+  hfStyle.textContent = `.hf-photo{width:var(--hf-photo-size)!important;height:var(--hf-photo-size)!important}`;
+  document.head.appendChild(hfStyle);
+  const origAfter3 = afterUpdate;
+  afterUpdate = function(vn){
+    origAfter3(vn);
+    if(vn==='--hf-photo-size'){
+      document.querySelectorAll('.hf-photo').forEach(el=>{el.style.width=getVar('--hf-photo-size');el.style.height=getVar('--hf-photo-size')});
+    }
+  };
+
+  sec = buildSection(c, '查看按钮', '🔗');
+  sec.appendChild(sliderRow('按钮字号', '--text-sm', 8, 20, 1, 'px'));
+  sec.appendChild(colorRow('按钮颜色', '--color-text-secondary'));
+})();
+
+/* ── 🧾 小票卡片 ── */
+(function buildReceiptCtrls(){
+  const c = $('#ctrl-receipt');
+  c.innerHTML = '<div style="font-family:var(--font-family-display);font-size:var(--text-sm);color:var(--color-text-secondary);padding:12px 0;text-align:center">调整小票卡片的各项参数 · 点击印章可动态盖下</div>';
+
+  let sec = buildSection(c, '卡片容器', '🧾');
+  sec.appendChild(sliderRow('最大宽度', '--card-max-width', 200, 500, 4, 'px'));
+  sec.appendChild(sliderRow('卡片圆角', '--radius-lg', 0, 24, 1, 'px'));
+  sec.appendChild(colorRow('卡片背景', '--color-surface'));
+
+  sec = buildSection(c, '抠图区', '🖼️');
+  sec.appendChild(sliderRow('抠图最大宽', '--rc-cutout-max', 100, 260, 4, 'px'));
+  sec.appendChild(sliderRow('抠图最大高', '--rc-cutout-max-h', 100, 260, 4, 'px'));
+  setVar('--rc-cutout-max','180'); setVar('--rc-cutout-max-h','180');
+
+  sec = buildSection(c, '饮品名', '📝');
+  sec.appendChild(sliderRow('名称字号', '--text-lg', 12, 36, 1, 'px'));
+  sec.appendChild(colorRow('名称颜色', '--color-text-primary'));
+
+  sec = buildSection(c, '品牌/规格', '🏷️');
+  sec.appendChild(sliderRow('品牌字号', '--text-sm', 8, 24, 1, 'px'));
+  sec.appendChild(colorRow('品牌颜色', '--color-text-secondary'));
+
+  sec = buildSection(c, '印章评分', '🪄');
+  sec.appendChild(sliderRow('印章尺寸', '--rc-stamp-size', 18, 48, 2, 'px'));
+  sec.appendChild(sliderRow('印章旋转', '--stamp-rotation', -15, 15, 0.5, 'deg'));
+  sec.appendChild(sliderRow('墨水模糊', '--stamp-blur', 0, 8, 0.5, 'px'));
+  sec.appendChild(colorRow('印章红', '--accent'));
+  sec.appendChild(colorRow('空章虚线色', '--tea-300'));
+  setVar('--rc-stamp-size','28');
+  // Apply stamp sizes
+  const stampStyle = document.createElement('style'); stampStyle.id='stamp-size-style';
+  stampStyle.textContent = `.rc-stamp{width:var(--rc-stamp-size)!important;height:var(--rc-stamp-size)!important}`;
+  document.head.appendChild(stampStyle);
+  const origAfter4 = afterUpdate;
+  afterUpdate = function(vn){
+    origAfter4(vn);
+    if(vn==='--rc-stamp-size'){
+      document.querySelectorAll('.rc-stamp').forEach(el=>{el.style.width=getVar('--rc-stamp-size');el.style.height=getVar('--rc-stamp-size')});
+    }
+    if(vn==='--stamp-rotation'||vn==='--stamp-blur'){
+      document.querySelectorAll('.rc-stamp--filled').forEach(el=>{
+        el.style.transform = 'rotate('+getVar('--stamp-rotation')+')';
+        el.style.textShadow = '0 0 '+getVar('--stamp-blur')+' rgba(201,74,58,0.3), 0 0 6px rgba(201,74,58,0.12)';
+      });
+    }
+    if(vn==='--rc-cutout-max'||vn==='--rc-cutout-max-h'){
+      const ph = $('#rc-cutout-demo');
+      if(ph){ ph.style.width=getVar('--rc-cutout-max'); ph.style.height=getVar('--rc-cutout-max-h'); }
+    }
+  };
+
+  sec = buildSection(c, '价格', '💰');
+  sec.appendChild(sliderRow('价格字号', '--text-2xl', 16, 48, 1, 'px'));
+  sec.appendChild(colorRow('价格颜色', '--color-text-primary'));
+
+  sec = buildSection(c, '心情文字', '💭');
+  sec.appendChild(sliderRow('心情字号', '--text-base', 10, 24, 1, 'px'));
+  sec.appendChild(colorRow('心情颜色', '--color-text-secondary'));
+
+  sec = buildSection(c, '收藏按钮', '⭐');
+  sec.appendChild(sliderRow('按钮尺寸', '--fav-btn-size', 20, 44, 2, 'px'));
+  sec.appendChild(colorRow('心形颜色', '--tea-400'));
+  sec.appendChild(colorRow('激活色', '--accent'));
+  setVar('--fav-btn-size','30');
+  const favStyle = document.createElement('style'); favStyle.id='fav-style';
+  favStyle.textContent = `.rc-fav-btn{width:var(--fav-btn-size)!important;height:var(--fav-btn-size)!important}`;
+  document.head.appendChild(favStyle);
+})();
+
+/* ── ✍️ 填写页 ── */
+(function buildInfoFormCtrls(){
+  const c = $('#ctrl-infoform');
+  c.innerHTML = '<div style="font-family:var(--font-family-display);font-size:var(--text-sm);color:var(--color-text-secondary);padding:12px 0;text-align:center">调整填写页表单元素的各项参数</div>';
+
+  let sec = buildSection(c, '输入框', '📝');
+  sec.appendChild(sliderRow('输入框高度', '--input-height', 32, 64, 2, 'px'));
+  sec.appendChild(sliderRow('边框宽度', '--input-border', 0.5, 4, 0.5, 'px'));
+  sec.appendChild(sliderRow('圆角', '--radius-md', 0, 20, 1, 'px'));
+  sec.appendChild(colorRow('边框颜色', '--color-border'));
+  sec.appendChild(colorRow('聚焦边框色', '--tea-500'));
+  sec.appendChild(colorRow('背景色', '--color-surface'));
+  setVar('--input-height','48'); setVar('--input-border','1.5');
+  const inputStyle = document.createElement('style'); inputStyle.id='input-style';
+  inputStyle.textContent = `.info-input,.info-select-box{height:var(--input-height)!important;border-width:var(--input-border)!important}`;
+  document.head.appendChild(inputStyle);
+
+  sec = buildSection(c, '小料标签', '🏷️');
+  sec.appendChild(sliderRow('标签内边距X', '--tag-px', 4, 24, 1, 'px'));
+  sec.appendChild(sliderRow('标签内边距Y', '--tag-py', 1, 12, 1, 'px'));
+  sec.appendChild(sliderRow('标签圆角', '--radius-full', 4, 40, 1, 'px'));
+  sec.appendChild(colorRow('未选背景', '--tea-50'));
+  sec.appendChild(colorRow('选中背景', '--tea-500'));
+  sec.appendChild(colorRow('选中文字色', '--color-text-inverse'));
+  setVar('--tag-px','12'); setVar('--tag-py','4');
+
+  sec = buildSection(c, '印章评分', '🪄');
+  sec.appendChild(sliderRow('印章尺寸', '--info-stamp-size', 28, 60, 2, 'px'));
+  sec.appendChild(sliderRow('印章旋转', '--stamp-rotation', -15, 15, 0.5, 'deg'));
+  sec.appendChild(colorRow('印章红', '--accent'));
+  setVar('--info-stamp-size','44');
+
+  sec = buildSection(c, '字段标签', '📋');
+  sec.appendChild(sliderRow('标签字号', '--text-sm', 8, 20, 1, 'px'));
+  sec.appendChild(colorRow('标签颜色', '--color-text-secondary'));
+})();
+
+/* ── 🎬 撕小票 ── */
+(function buildTearCtrls(){
+  const c = $('#ctrl-tear');
+  c.innerHTML = '<div style="font-family:var(--font-family-display);font-size:var(--text-sm);color:var(--color-text-secondary);padding:12px 0;text-align:center">调整撕小票页面的各项参数</div>';
+
+  let sec = buildSection(c, '遮罩/背景', '🎭');
+  sec.appendChild(colorRow('遮罩背景色', '--tea-50'));
+
+  sec = buildSection(c, '小票窗口', '🧾');
+  sec.appendChild(sliderRow('小票宽度', '--tear-width', 200, 400, 4, 'px'));
+  sec.appendChild(sliderRow('小票圆角', '--radius-lg', 0, 24, 1, 'px'));
+  sec.appendChild(colorRow('小票背景', '--color-surface'));
+  sec.appendChild(sliderRow('内边距', '--space-5', 8, 40, 2, 'px'));
+  setVar('--tear-width','280');
+  const tearStyle = document.createElement('style'); tearStyle.id='tear-style';
+  tearStyle.textContent = `.tear-receipt{width:var(--tear-width)!important;padding:var(--space-5)!important}.tear-tear-line{width:calc(var(--tear-width) + 60px)!important}`;
+  document.head.appendChild(tearStyle);
+
+  sec = buildSection(c, '抠图', '🖼️');
+  sec.appendChild(sliderRow('抠图尺寸', '--tear-cutout', 60, 180, 4, 'px'));
+  setVar('--tear-cutout','100');
+  const tearCutStyle = document.createElement('style'); tearCutStyle.id='tear-cut-style';
+  tearCutStyle.textContent = `.tear-receipt-cutout-placeholder{width:var(--tear-cutout)!important;height:var(--tear-cutout)!important}`;
+  document.head.appendChild(tearCutStyle);
+
+  sec = buildSection(c, '名称', '📝');
+  sec.appendChild(sliderRow('名称字号', '--text-lg', 12, 36, 1, 'px'));
+  sec.appendChild(colorRow('名称颜色', '--color-text-primary'));
+
+  sec = buildSection(c, '价格', '💰');
+  sec.appendChild(sliderRow('价格字号', '--text-lg', 12, 36, 1, 'px'));
+  sec.appendChild(colorRow('价格颜色', '--accent'));
+
+  sec = buildSection(c, '提示文字', '💬');
+  sec.appendChild(sliderRow('提示字号', '--text-sm', 8, 24, 1, 'px'));
+  sec.appendChild(colorRow('提示颜色', '--color-text-secondary'));
+})();
+
+/* ═══════════════════════════════════════════════════
+   Global Actions
+   ═══════════════════════════════════════════════════ */
+function exportCSS(){
+  const vars = [
+    '--tea-50','--tea-100','--tea-200','--tea-300','--tea-400','--tea-500','--tea-600','--tea-700','--tea-800','--tea-900',
+    '--accent','--accent-light','--accent-dark','--accent-glow',
+    '--success','--warning','--error','--info',
+    '--color-surface','--color-border','--color-divider',
+    '--color-text-primary','--color-text-secondary','--color-text-hint','--color-text-inverse',
+    '--text-xs','--text-sm','--text-base','--text-md','--text-lg','--text-xl','--text-2xl','--text-3xl',
+    '--space-1','--space-2','--space-3','--space-4','--space-5','--space-6','--space-8','--space-10','--space-12','--space-16',
+    '--radius-sm','--radius-md','--radius-lg','--radius-xl','--radius-full',
+    '--shadow-sm','--shadow-md','--shadow-lg','--shadow-glow',
+    '--duration-instant','--duration-fast','--duration-normal','--duration-slow','--duration-tear','--duration-stamp','--duration-fly',
+    '--noise-opacity','--stamp-rotation','--stamp-blur','--card-max-width'
+  ];
+  let css = ':root {\n';
+  vars.forEach(v=>{ css += `  ${v}: ${getVar(v)};\n`; });
+  css += '}';
+  navigator.clipboard.writeText(css).then(()=>{
+    alert('✅ CSS 变量已复制到剪贴板！');
+  }).catch(()=>{
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = css; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    alert('✅ CSS 变量已复制到剪贴板！');
+  });
+}
+
+function resetAll(){
+  Object.entries(DEFAULTS).forEach(([k,v])=>{
+    setVar(k, v);
+    if(k.startsWith('--space-')) setVar('--spacing'+k.slice(6), v);
+    syncAliases(k);
+  });
+  // Reset custom vars
+  setVar('--ms-photo-size','48'); setVar('--hf-photo-size','48');
+  setVar('--rc-cutout-max','180'); setVar('--rc-cutout-max-h','180');
+  setVar('--rc-stamp-size','28'); setVar('--fav-btn-size','30');
+  setVar('--input-height','48'); setVar('--input-border','1.5');
+  setVar('--tag-px','12'); setVar('--tag-py','4');
+  setVar('--info-stamp-size','44'); setVar('--tear-width','280');
+  setVar('--tear-cutout','100');
+  buildGlobalSwatches();
+  buildCalendarGrid();
+  rebuildStamps();
+  // Refresh all slider displays
+  refreshAllSliders();
+  alert('✅ 所有参数已重置为默认值');
+}
+
+function refreshAllSliders(){
+  document.querySelectorAll('.ctrl-row input[type=range]').forEach(inp=>{
+    inp.dispatchEvent(new Event('input',{bubbles:true}));
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   Stamp click interaction
+   ═══════════════════════════════════════════════════ */
+function setupStampInteraction(){
+  // Receipt stamps — interactive
+  const rcStamps = $('#rc-stamps-demo');
+  if(rcStamps){
+    rcStamps.addEventListener('click', (e)=>{
+      const stamp = e.target.closest('.rc-stamp');
+      if(!stamp) return;
+      const stamps = [...rcStamps.querySelectorAll('.rc-stamp')];
+      const idx = stamps.indexOf(stamp);
+      stamps.forEach((s,i)=>{
+        if(i<=idx){
+          s.classList.add('rc-stamp--filled');
+          s.classList.remove('rc-stamp--empty');
+          s.textContent = '★';
+          s.style.animation = 'none';
+          s.offsetHeight;
+          s.style.animation = 'stamp-down '+getVar('--duration-stamp')+' '+getVar('--ease-spring')+' forwards';
+        } else {
+          s.classList.remove('rc-stamp--filled');
+          s.classList.add('rc-stamp--empty');
+          s.textContent = '';
+          s.style.animation = 'none';
+        }
+      });
+    });
+  }
+  // Info form stamps — interactive
+  const infoStamps = $('#info-stamps-demo');
+  if(infoStamps){
+    infoStamps.addEventListener('click', (e)=>{
+      const stamp = e.target.closest('.info-stamp-demo');
+      if(!stamp) return;
+      const stamps = [...infoStamps.querySelectorAll('.info-stamp-demo')];
+      const idx = stamps.indexOf(stamp);
+      stamps.forEach((s,i)=>{
+        if(i<=idx){
+          s.classList.add('info-stamp-demo--filled');
+          s.classList.remove('info-stamp-demo--empty');
+          s.textContent = '★';
+        } else {
+          s.classList.remove('info-stamp-demo--filled');
+          s.classList.add('info-stamp-demo--empty');
+          s.textContent = '';
+        }
+      });
+    });
+  }
+  // Favorite button toggle
+  const favBtn = $('#rc-fav-demo');
+  if(favBtn){
+    favBtn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      if(favBtn.textContent === '♡'){
+        favBtn.textContent = '♥';
+        favBtn.style.color = getVar('--accent');
+      } else {
+        favBtn.textContent = '♡';
+        favBtn.style.color = '';
+      }
+    });
+  }
+}
+
+/* ── Add stamp-down keyframes ── */
+const stampKeyframes = document.createElement('style');
+stampKeyframes.textContent = `
+@keyframes stamp-down{
+  0%{transform:scale(1.8) rotate(-8deg);opacity:0.2}
+  60%{transform:scale(0.92) rotate(-2deg);opacity:1}
+  80%{transform:scale(1.06) rotate(-3.5deg)}
+  100%{transform:scale(1.0) rotate(var(--stamp-rotation))}
+}`;
+document.head.appendChild(stampKeyframes);
+
+/* ═══════════════════════════════════════════════════
+   Init
+   ═══════════════════════════════════════════════════ */
+function init(){
+  buildGlobalSwatches();
+  buildCalendarGrid();
+  rebuildStamps();
+  setupStampInteraction();
+  // Default to calendar tab
+  switchTab('calendar');
+}
+
+init();
+</script>
+</body>
+</html>

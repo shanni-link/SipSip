@@ -1,0 +1,556 @@
+/* ═══════════════════════════════════════════════════
+   Step4Info — 填写信息 + 心情记录（合一）
+   ═══════════════════════════════════════════════════ */
+
+.step-info {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.step-info__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ═══════════════════════ 抠图预览 ═══════════════════════ */
+
+.info-cutout-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin-top: var(--spacing-2);
+  margin-bottom: calc(-1 * var(--spacing-2));
+  position: relative;
+  z-index: 110;
+}
+
+.info-cutout-preview__img-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  height: 200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.info-cutout-preview__img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  /* 白色实粗描边 */
+  filter:
+    drop-shadow(0 0 2px rgba(255, 255, 255, 0.85));
+}
+
+/* 小叉号 */
+.info-cutout-preview__close {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--color-tea-300);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+  transition: all var(--duration-fast);
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 1px 4px rgba(47, 31, 18, 0.12);
+}
+
+.info-cutout-preview__close:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* 叉掉后的重新上传区 */
+.info-cutout-preview--dismissed {
+  padding: var(--spacing-3);
+  background: var(--color-tea-50);
+  border-radius: var(--radius-md);
+  border: 1.5px dashed var(--color-tea-200);
+}
+
+.info-cutout-preview__dismissed-text {
+  font-family: var(--font-family-body);
+  font-size: var(--text-xs);
+  color: var(--color-text-hint);
+  margin: 0 0 var(--spacing-2) 0;
+}
+
+.info-cutout-preview__actions {
+  display: flex;
+  gap: var(--spacing-3);
+  justify-content: center;
+}
+
+/* 复用 Step1Photo 的按钮样式 */
+.step-photo__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-4);
+  border: 1.5px solid var(--color-tea-300);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-tea-600);
+  font-family: var(--font-family-body);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.step-photo__btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* ── 字段容器 ── */
+
+.info-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.info-field__label {
+  font-family: var(--font-family-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.info-field__optional {
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-hint);
+}
+
+/* ── 名称行（输入框 + 收藏星） ── */
+
+.info-name-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.info-name-row .info-field__input {
+  flex: 1;
+}
+
+.info-favorite-star {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: none;
+  color: var(--color-tea-300);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all var(--duration-fast);
+  -webkit-tap-highlight-color: transparent;
+  border-radius: var(--radius-sm);
+}
+
+.info-favorite-star:hover {
+  color: var(--color-accent);
+}
+
+.info-favorite-star--active {
+  color: var(--color-accent);
+}
+
+/* ── 文本输入 ── */
+
+.info-field__input {
+  width: 100%;
+  height: 48px;
+  padding: 0 var(--spacing-4);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  font-family: var(--font-family-body);
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color var(--duration-fast) var(--ease-default),
+              box-shadow var(--duration-fast) var(--ease-default);
+  box-sizing: border-box;
+  /* 修复移动端 date 输入框原生组件高度不一致 */
+  line-height: 48px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* date 输入框统一高度（避免手机端原生控件撑高） */
+.info-field__input[type="date"] {
+  min-height: 48px;
+}
+
+.info-field__input[type="date"]::-webkit-calendar-picker-indicator {
+  margin-left: auto;
+}
+
+.info-field__input:focus {
+  border-color: var(--color-tea-500);
+  box-shadow: 0 0 0 3px rgba(139, 107, 74, 0.12);
+}
+
+.info-field__input::placeholder {
+  color: var(--color-text-hint);
+}
+
+.info-field__input--sm {
+  height: 40px;
+  font-size: var(--text-sm);
+}
+
+/* ── 选择框（品牌 / 杯型 / 甜度 / 温度 — 点击弹出） ── */
+
+.info-select-box {
+  width: 100%;
+  height: 48px;
+  padding: 0 var(--spacing-4);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  font-family: var(--font-family-body);
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: border-color var(--duration-fast) var(--ease-default);
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+.info-select-box:active {
+  border-color: var(--color-tea-500);
+}
+
+.info-select-box--filled {
+  border-color: var(--color-tea-400);
+  background: var(--color-tea-50);
+}
+
+.info-select-box__text {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.info-select-box__placeholder {
+  color: var(--color-text-hint);
+  font-weight: var(--font-weight-normal);
+}
+
+/* 三列并排 */
+.info-select-box--inline {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 0 var(--spacing-2);
+  font-size: var(--text-sm);
+  justify-content: center;
+  gap: 2px;
+}
+
+.info-select-box--inline .info-select-box__text {
+  font-size: var(--text-sm);
+}
+
+.info-select-box--inline .info-select-box__placeholder {
+  font-size: var(--text-sm);
+}
+
+.info-triple-row {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+/* ── 小料多选 ── */
+
+.info-topping-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+}
+
+.info-topping-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: var(--spacing-1) var(--spacing-3);
+  border: 1.5px solid var(--color-tea-200);
+  border-radius: var(--radius-full);
+  background: var(--color-tea-50);
+  color: var(--color-tea-600);
+  font-family: var(--font-family-body);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-default);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.info-topping-tag:hover {
+  border-color: var(--color-tea-400);
+}
+
+.info-topping-tag--selected {
+  background: var(--color-tea-500);
+  color: var(--color-text-inverse);
+  border-color: var(--color-tea-500);
+}
+
+/* ── 价格 ── */
+
+.info-price-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.info-price-unit {
+  font-family: var(--font-family-receipt);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-secondary);
+  padding: 0 var(--spacing-3);
+  flex-shrink: 0;
+}
+
+.info-field__input--price {
+  font-family: var(--font-family-receipt);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-bold);
+  text-align: right;
+  padding-right: var(--spacing-4);
+}
+
+/* ── 评分印章 ── */
+
+.info-rating-row {
+  display: flex;
+  gap: var(--spacing-3);
+  align-items: center;
+}
+
+.info-stamp {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  border: 2px dashed var(--color-tea-300);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-default);
+  -webkit-tap-highlight-color: transparent;
+  padding: 0;
+}
+
+.info-stamp:hover {
+  border-color: var(--color-accent);
+}
+
+.info-stamp--filled {
+  background: var(--color-accent);
+  border: 2px solid var(--color-accent);
+  color: var(--color-text-inverse);
+  font-family: var(--font-family-stamp);
+  font-size: 24px;
+  font-weight: var(--font-weight-bold);
+  transform: rotate(-3deg);
+  box-shadow: 0 0 8px var(--color-accent-glow);
+}
+
+/* ═══════════════════════ 心情记录（紧凑一行） ═══════════════════════ */
+
+.info-mood-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+/* 录音麦克风按钮 */
+.info-mood-mic {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-tea-300);
+  background: var(--color-surface);
+  color: var(--color-tea-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all var(--duration-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.info-mood-mic:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* 录音中 */
+.info-mood-mic--recording {
+  border-color: var(--color-accent);
+  background: var(--color-accent-glow);
+  width: auto;
+  padding: 0 var(--spacing-3);
+  gap: var(--spacing-2);
+}
+
+.info-mood-mic__dot {
+  width: 8px;
+  height: 8px;
+  background: var(--color-accent);
+  border-radius: 2px;
+  animation: mood-dot-blink 1s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes mood-dot-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+.info-mood-mic__time {
+  font-family: var(--font-family-receipt);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+
+/* 已录音 */
+.info-mood-mic--done {
+  border-color: var(--color-success);
+  background: rgba(90, 143, 108, 0.06);
+}
+
+/* 心情文字输入 */
+.info-mood-text-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.info-mood-hint {
+  font-family: var(--font-family-body);
+  font-size: var(--text-xs);
+  color: var(--color-accent);
+  margin: 0;
+  padding-left: calc(44px + var(--spacing-2)); /* 对齐输入框 */
+}
+
+.info-mood-hint--warn {
+  color: var(--color-tea-500);
+}
+
+/* ═══════════════════════ 弹窗选项网格 ═══════════════════════ */
+
+.info-popup-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-2);
+}
+
+/* 品牌网格 — 5列适配更多选项 */
+.info-popup-grid--brand {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.info-popup-option {
+  padding: var(--spacing-2) var(--spacing-2);
+  border: 1.5px solid var(--color-tea-300);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-tea-700);
+  font-family: var(--font-family-body);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-default);
+  -webkit-tap-highlight-color: transparent;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.info-popup-option:hover,
+.info-popup-option:active {
+  border-color: var(--color-tea-500);
+  background: var(--color-tea-100);
+}
+
+.info-popup-option--selected {
+  background: var(--color-tea-500);
+  color: var(--color-text-inverse);
+  border-color: var(--color-tea-500);
+}
+
+/* ── 品牌自定义输入 ── */
+
+.info-popup-custom {
+  display: flex;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-4);
+  padding-top: var(--spacing-4);
+  border-top: 1px solid var(--color-divider);
+}
+
+.info-popup-custom .info-field__input {
+  flex: 1;
+}
+
+.info-popup-custom__btn {
+  flex-shrink: 0;
+  padding: 0 var(--spacing-5);
+  height: 48px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-tea-500);
+  color: var(--color-text-inverse);
+  font-family: var(--font-family-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.info-popup-custom__btn:hover {
+  background: var(--color-tea-600);
+}
+
+.info-popup-custom__btn:disabled {
+  background: var(--color-tea-200);
+  color: var(--color-tea-400);
+  cursor: not-allowed;
+}

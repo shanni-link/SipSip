@@ -1,0 +1,51 @@
+/* ═══════════════════════════════════════════════════
+   TeaThumb — 单张奶茶缩略图（透明抠图）
+   ═══════════════════════════════════════════════════ */
+
+.tea-thumb {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-sm);
+  overflow: visible;
+  position: relative;
+  flex-shrink: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 轻微阴影 */
+  filter: drop-shadow(1px 1.5px 2px rgba(47, 31, 18, 0.16));
+}
+
+.tea-thumb__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  /* 1px 白描边 + 微弱发光 */
+  filter:
+    drop-shadow( 0   1px 0 rgba(255,255,255,0.82))
+    drop-shadow( 0  -1px 0 rgba(255,255,255,0.82))
+    drop-shadow( 1px  0  0 rgba(255,255,255,0.82))
+    drop-shadow(-1px  0  0 rgba(255,255,255,0.82))
+    drop-shadow( 0   0 1.2px rgba(255,255,255,0.55));
+}
+
+/* 空态 */
+.tea-thumb--empty {
+  background: var(--color-tea-100);
+  border-radius: var(--radius-sm);
+  filter: none;
+}
+
+/* ── 尺寸变体 ── */
+
+.tea-thumb--lg {
+  width: 96px;
+  height: 96px;
+}
+
+.tea-thumb--xl {
+  width: 130px;
+  height: 130px;
+}

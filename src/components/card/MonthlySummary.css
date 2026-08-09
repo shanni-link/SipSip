@@ -1,0 +1,98 @@
+/* ═══════════════════════════════════════════════════
+   MonthlySummary — 月度统计卡片
+   虚线缝线边框 + 旋转抠图层叠
+   ═══════════════════════════════════════════════════ */
+
+.monthly-summary {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  border: 1.5px dashed var(--color-tea-300);
+  padding: var(--spacing-2) var(--spacing-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+/* ═══════════════════════ 空态 ═══════════════════════ */
+
+.monthly-summary--empty {
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  border: 1.5px dashed var(--color-tea-200);
+  background: var(--color-tea-50);
+}
+
+.monthly-summary__empty-icon {
+  font-size: 32px;
+}
+
+.monthly-summary__empty-text {
+  font-family: var(--font-family-display);
+  font-size: var(--text-base);
+  color: var(--color-text-hint);
+  margin: 0;
+}
+
+/* ═══════════════════════ 顶行：标题左 + 照片墙右 ═══════════════════════ */
+
+.monthly-summary__top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+/* ═══════════════════════ 标题 ═══════════════════════ */
+
+.monthly-summary__header {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.monthly-summary__header-text {
+  font-family: var(--font-family-display);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+/* ═══════════════════════ 照片墙 ═══════════════════════ */
+
+.monthly-summary__photo-wall {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+  padding-right: var(--spacing-1);
+}
+
+.monthly-summary__photo {
+  flex-shrink: 0;
+}
+
+/* 照片墙内抠图缩小，确保 5 张可完整可见 */
+.monthly-summary__photo .tea-thumb {
+  width: 56px;
+  height: 56px;
+}
+
+/* 第二张起向左堆叠，间距拉大确保每张可见 */
+.monthly-summary__photo:not(:first-child) {
+  margin-left: -16px;
+}
+
+/* ═══════════════════════ 金额 ═══════════════════════ */
+
+.monthly-summary__amount {
+  margin: 0;
+  padding-top: var(--spacing-1);
+  border-top: 1px dashed var(--color-divider);
+  font-family: var(--font-family-receipt);
+  font-size: var(--text-xs);
+  color: var(--color-text-hint);
+  letter-spacing: 0.04em;
+}

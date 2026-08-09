@@ -1,0 +1,184 @@
+/* ═══════════════════════════════════════════════════
+   ReceiptModal — 底部滑入小票详情
+   遮罩 + 底部抽屉 + 语音播放 + 编辑/删除
+   ═══════════════════════════════════════════════════ */
+
+/* ── 遮罩 ── */
+
+.receipt-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(47, 31, 18, 0.35);
+  z-index: 400;
+  animation: fade-in var(--duration-normal) var(--ease-out);
+}
+
+.receipt-modal__backdrop--closing {
+  animation: fade-in var(--duration-fast) var(--ease-in) reverse forwards;
+}
+
+/* ── 底部抽屉 ── */
+
+.receipt-modal {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-height: 90dvh;
+  background: var(--color-surface);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  z-index: 401;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -8px 30px rgba(47, 31, 18, 0.14);
+  animation: slide-up 300ms var(--ease-out);
+  overflow: hidden;
+}
+
+.receipt-modal--closing {
+  animation: slide-down var(--duration-fast) var(--ease-in) forwards;
+}
+
+/* ── 拖拽指示条 ── */
+
+.receipt-modal__handle {
+  display: flex;
+  justify-content: center;
+  padding: var(--spacing-2) 0;
+  flex-shrink: 0;
+  cursor: grab;
+}
+
+.receipt-modal__handle-bar {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-tea-300);
+  opacity: 0.6;
+}
+
+/* ── 小票主体 ── */
+
+.receipt-modal__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-4) var(--spacing-5);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── 语音播放栏 ── */
+
+.receipt-modal__voice-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: 0 var(--spacing-5) var(--spacing-2);
+  flex-shrink: 0;
+}
+
+.receipt-modal__voice-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-5);
+  border: 1.5px solid var(--color-tea-300);
+  border-radius: var(--radius-full);
+  background: var(--color-tea-50);
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-body);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-default);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.receipt-modal__voice-btn:hover {
+  border-color: var(--color-tea-400);
+  color: var(--color-text-primary);
+}
+
+.receipt-modal__voice-btn--playing {
+  background: var(--color-tea-200);
+  border-color: var(--color-tea-500);
+  color: var(--color-tea-700);
+}
+
+/* ── 语音波浪动画 ── */
+
+.receipt-modal__voice-waves {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 16px;
+}
+
+.receipt-modal__wave {
+  display: block;
+  width: 3px;
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 2px;
+  animation: wave 0.8s ease-in-out infinite;
+}
+
+.receipt-modal__wave:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.receipt-modal__wave:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.receipt-modal__wave:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+/* ── 操作按钮 ── */
+
+.receipt-modal__actions {
+  display: flex;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4) var(--spacing-5);
+  border-top: 1px solid var(--color-divider);
+  flex-shrink: 0;
+}
+
+.receipt-modal__btn {
+  flex: 1;
+  padding: var(--spacing-3);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-family-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+  cursor: pointer;
+  transition: opacity var(--duration-fast) var(--ease-default);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.receipt-modal__btn:active {
+  opacity: 0.8;
+}
+
+.receipt-modal__btn--edit {
+  background: var(--color-tea-100);
+  color: var(--color-tea-700);
+}
+
+.receipt-modal__btn--delete {
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+}
+
+/* ── 安全区 ── */
+
+.receipt-modal__safe-area {
+  height: env(safe-area-inset-bottom, 0px);
+  min-height: env(safe-area-inset-bottom, 0px);
+  flex-shrink: 0;
+}

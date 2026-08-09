@@ -1,0 +1,41 @@
+/* ═══════════════════════════════════════════════════
+   StepIndicator — 步骤指示器
+   提取自 Header.css，与 StepHeader 解耦
+   ═══════════════════════════════════════════════════ */
+
+.step-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-tea-300);
+  transition: all var(--duration-normal) var(--ease-default);
+}
+
+.step-dot--done {
+  background: var(--color-tea-500);
+}
+
+.step-dot--current {
+  background: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(201, 74, 58, 0.2);
+  width: 10px;
+  height: 10px;
+}
+
+.step-line {
+  width: 12px;
+  height: 2px;
+  background: var(--color-tea-200);
+  border-radius: 1px;
+  transition: background var(--duration-normal) var(--ease-default);
+}
+
+.step-line--done {
+  background: var(--color-tea-500);
+}

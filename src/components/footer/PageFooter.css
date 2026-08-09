@@ -1,0 +1,93 @@
+/* ═══════════════════════════════════════════════════
+   PageFooter — 底部操作栏
+   上一步 + 下一步/确认 | iPhone 安全区适配
+   ═══════════════════════════════════════════════════ */
+
+.page-footer {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-divider);
+  z-index: 50;
+}
+
+.page-footer__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  padding: var(--spacing-3) var(--spacing-4);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ═══════════════════════ 按钮通用 ═══════════════════════ */
+
+.page-footer__btn {
+  flex: 1;
+  height: 44px;
+  border-radius: var(--radius-lg);
+  font-family: var(--font-family-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-default);
+  border: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  line-height: 1.4;
+}
+
+.page-footer__btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* ═══════════════════════ 上一步 ═══════════════════════ */
+
+.page-footer__btn--prev {
+  background: transparent;
+  border: 1.5px solid var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.page-footer__btn--prev:hover:not(:disabled) {
+  background: var(--color-tea-50);
+  border-color: var(--color-tea-300);
+}
+
+/* ═══════════════════════ 下一步 ═══════════════════════ */
+
+.page-footer__btn--next {
+  background: var(--color-tea-500);
+  color: #fff;
+}
+
+.page-footer__btn--next:hover:not(:disabled) {
+  background: var(--color-tea-600);
+}
+
+/* ═══════════════════════ 确认（最后一步） ═══════════════════════ */
+
+.page-footer__btn--confirm {
+  background: var(--color-accent);
+}
+
+.page-footer__btn--confirm:hover:not(:disabled) {
+  background: #b23a2c;
+}
+
+/* ═══════════════════════ 禁用态 ═══════════════════════ */
+
+.page-footer__btn--disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ═══════════════════════ iPhone 底部安全区 ═══════════════════════ */
+
+.page-footer__safe-area {
+  height: env(safe-area-inset-bottom, 0px);
+  background: var(--color-surface);
+}

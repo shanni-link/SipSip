@@ -1,0 +1,234 @@
+/* ═══════════════════════════════════════════════════
+   Step3Cutout — AI 抠图
+   ═══════════════════════════════════════════════════ */
+
+.step-cutout {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.step-cutout__body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-4);
+}
+
+/* ── 空态 ── */
+
+.step-cutout__empty {
+  color: var(--color-text-hint);
+  font-family: var(--font-family-body);
+}
+
+/* ── 开始抠图 ── */
+
+.step-cutout__start {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-6);
+}
+
+.step-cutout__original {
+  width: 100%;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.step-cutout__original-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 45dvh;
+  object-fit: cover;
+}
+
+.step-cutout__start-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-3);
+  width: 100%;
+}
+
+.step-cutout__process-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-4) var(--spacing-8);
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  font-family: var(--font-family-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: opacity var(--duration-fast) var(--ease-default);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.step-cutout__process-btn:active {
+  opacity: 0.85;
+}
+
+.step-cutout__mode-hint {
+  font-family: var(--font-family-body);
+  font-size: var(--text-xs);
+  color: var(--color-text-hint);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.step-cutout__mode-switch {
+  font-family: var(--font-family-body);
+  font-size: var(--text-xs);
+  color: var(--color-tea-500);
+  background: none;
+  border: none;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* ── 处理中 ── */
+
+.step-cutout__processing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.step-cutout__spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--color-tea-200);
+  border-top-color: var(--color-tea-500);
+  border-radius: var(--radius-full);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.step-cutout__processing-text {
+  font-family: var(--font-family-display);
+  font-size: var(--text-md);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.step-cutout__processing-hint {
+  font-family: var(--font-family-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-hint);
+  margin: 0;
+}
+
+/* ── 抠图结果 ── */
+
+.step-cutout__result {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-5);
+}
+
+.step-cutout__result-title {
+  font-family: var(--font-family-display);
+  font-size: var(--text-lg);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.step-cutout__compare {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  width: 100%;
+}
+
+.step-cutout__compare-item {
+  flex: 1;
+  min-width: 0;
+}
+
+.step-cutout__compare-label {
+  font-family: var(--font-family-body);
+  font-size: var(--text-xs);
+  color: var(--color-text-hint);
+  margin: 0 0 var(--spacing-1);
+  text-align: center;
+}
+
+.step-cutout__compare-img-wrap {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  aspect-ratio: 1;
+}
+
+.step-cutout__compare-img-wrap--cutout {
+  background: url("data:image/svg+xml,%3Csvg width='16' height='16' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='8' height='8' fill='%23e8e0d5'/%3E%3Crect x='8' y='8' width='8' height='8' fill='%23e8e0d5'/%3E%3Crect x='8' width='8' height='8' fill='%23f0ebe0'/%3E%3Crect y='8' width='8' height='8' fill='%23f0ebe0'/%3E%3C/svg%3E");
+}
+
+.step-cutout__compare-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.step-cutout__compare-arrow {
+  flex-shrink: 0;
+}
+
+.step-cutout__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2);
+  width: 100%;
+}
+
+.step-cutout__action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-5);
+  border-radius: var(--radius-full);
+  font-family: var(--font-family-body);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-default);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.step-cutout__action-btn--retry {
+  border: 1.5px solid var(--color-tea-300);
+  background: var(--color-surface);
+  color: var(--color-tea-600);
+}
+
+.step-cutout__action-btn--retry:hover {
+  background: var(--color-tea-50);
+}
+
+.step-cutout__action-btn--switch {
+  border: none;
+  background: transparent;
+  color: var(--color-tea-400);
+  text-decoration: underline;
+}
