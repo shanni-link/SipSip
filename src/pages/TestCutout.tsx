@@ -48,7 +48,7 @@ export default function TestCutout() {
 
         const blob = await removeBackground(dataUrl, {
           model: 'medium',
-          publicPath: location.origin + '/',
+          publicPath: import.meta.env.BASE_URL,
           debug: true,
           output: { format: 'image/png' },
           progress: (key: string, current: number, total: number) => {
@@ -225,7 +225,7 @@ export default function TestCutout() {
       </div>
 
       <p style={{ color: '#aaa', fontSize: 11, marginTop: 16, textAlign: 'center' }}>
-        Dev server: {window.location.origin} | publicPath: /
+        Dev server: {window.location.origin} | BASE_URL: {import.meta.env.BASE_URL}
       </p>
     </div>
   );

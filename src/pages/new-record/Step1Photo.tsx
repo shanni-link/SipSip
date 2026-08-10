@@ -9,8 +9,8 @@ import './Step1Photo.css';
 
 /* ═══════════════════════ 常量 ═══════════════════════ */
 
-/** 抠图超时（small 模型 ~17MB，给 60s） */
-const CUTOUT_TIMEOUT_MS = 60_000;
+/** 抠图超时（small 模型 ~44MB，给 120s，国内 GitHub Pages 较慢） */
+const CUTOUT_TIMEOUT_MS = 120_000;
 
 /* ═══════════════════════ Step1Photo ═══════════════════════ */
 
@@ -60,7 +60,7 @@ export const Step1Photo = memo(function Step1Photo() {
 
           const cutoutTask = removeBackground(dataUrl, {
             model: 'small',
-            publicPath: location.origin + '/',  // 本地模型文件
+            publicPath: import.meta.env.BASE_URL,
             debug: true,
             output: { format: 'image/png' },
             progress: (_key: string, current: number, total: number) => {
@@ -76,8 +76,8 @@ export const Step1Photo = memo(function Step1Photo() {
 
           return await Promise.race([cutoutTask, timeoutTask]);
         } catch (err) {
-          console.warn('Background removal failed, using original:', err);
-          return compressImage(dataUrl);
+          console.warn('Background removal failed:', err);
+          return null; // 失败时返回 null，让 Step3Cutout 提供重试
         }
       })();
 
@@ -100,7 +100,7 @@ export const Step1Photo = memo(function Step1Photo() {
       console.error('Cutout flow crashed:', err);
       update({
         photoDataUrl: dataUrl,
-        cutoutDataUrl: dataUrl,
+        // 不设置 cutoutDataUrl — 让 Step3Cutout 提供手动重试
       });
     } finally {
       setProcessing(false);
