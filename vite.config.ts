@@ -19,15 +19,15 @@ export default defineConfig({
 
       // PWA Manifest
       manifest: {
-        name: '🧋 奶茶记录仪',
-        short_name: '奶茶记录仪',
+        name: 'SipSip',
+        short_name: 'SipSip',
         description: '每一杯都是值得收藏的记忆 — 拍照、抠图、生成小票、日历回顾',
         theme_color: '#fbf5ed',
         background_color: '#fbf5ed',
         display: 'standalone',
         orientation: 'portrait-primary',
-        start_url: '/',
-        scope: '/',
+        start_url: './',
+        scope: './',
         lang: 'zh-CN',
       },
 
