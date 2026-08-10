@@ -52,60 +52,55 @@ export const Step1Photo = memo(function Step1Photo() {
     setProgress(0);
     setProgressPhase('download');
 
+    // 1. 先压缩照片（必须成功，作为最终兜底）
+    let photoDataUrl: string;
+    let exifResult: { date?: string; time?: string } | null = null;
     try {
-      // AI 抠图（模型从本地 public/ 加载，不走被墙 CDN）
-      const cutoutPromise = (async () => {
-        try {
-          const { removeBackground } = await import('@imgly/background-removal');
-
-          const cutoutTask = removeBackground(dataUrl, {
-            model: 'small',
-            publicPath: import.meta.env.BASE_URL,
-            debug: true,
-            output: { format: 'image/png' },
-            progress: (_key: string, current: number, total: number) => {
-              const pct = Math.round((current / total) * 100);
-              setProgress(pct);
-              if (pct > 90) setProgressPhase('inference');
-            },
-          }).then(blob => processCutoutResult(blob));
-
-          const timeoutTask = new Promise<string>((_, reject) =>
-            setTimeout(() => reject(new Error('Cutout timeout')), CUTOUT_TIMEOUT_MS)
-          );
-
-          return await Promise.race([cutoutTask, timeoutTask]);
-        } catch (err) {
-          console.warn('Background removal failed:', err);
-          return null; // 失败时返回 null，让 Step3Cutout 提供重试
-        }
-      })();
-
-      const photoPromise = compressImage(dataUrl);
-      const exifPromise = file ? readExifDateTime(file) : Promise.resolve(null);
-
-      const [cutoutDataUrl, exifResult, photoDataUrl] = await Promise.all([
-        cutoutPromise,
-        exifPromise,
-        photoPromise,
+      [photoDataUrl, exifResult] = await Promise.all([
+        compressImage(dataUrl),
+        file ? readExifDateTime(file) : Promise.resolve(null),
       ]);
-
-      update({
-        photoDataUrl,
-        cutoutDataUrl,
-        date: exifResult?.date ?? draft.date,
-        time: exifResult?.time ?? draft.time,
-      });
     } catch (err) {
-      console.error('Cutout flow crashed:', err);
-      update({
-        photoDataUrl: dataUrl,
-        // 不设置 cutoutDataUrl — 让 Step3Cutout 提供手动重试
-      });
-    } finally {
-      setProcessing(false);
-      navigate('/new/info');
+      console.error('Photo compression failed:', err);
+      photoDataUrl = dataUrl; // 兜底：用原图
     }
+
+    // 2. AI 抠图（可选，失败不影响流程）
+    let cutoutDataUrl: string | null = null;
+    try {
+      const { removeBackground } = await import('@imgly/background-removal');
+
+      const cutoutTask = removeBackground(dataUrl, {
+        model: 'small',
+        publicPath: import.meta.env.BASE_URL,
+        debug: true,
+        output: { format: 'image/png' },
+        progress: (_key: string, current: number, total: number) => {
+          const pct = Math.round((current / total) * 100);
+          setProgress(pct);
+          if (pct > 90) setProgressPhase('inference');
+        },
+      }).then(blob => processCutoutResult(blob));
+
+      const timeoutTask = new Promise<string>((_, reject) =>
+        setTimeout(() => reject(new Error('Cutout timeout')), CUTOUT_TIMEOUT_MS)
+      );
+
+      cutoutDataUrl = await Promise.race([cutoutTask, timeoutTask]);
+    } catch (err) {
+      console.warn('AI 抠图失败（可手动重试）:', err);
+      // cutoutDataUrl 保持 null，Step4Info 会显示原图 + 重试入口
+    }
+
+    update({
+      photoDataUrl,
+      cutoutDataUrl,
+      date: exifResult?.date ?? draft.date,
+      time: exifResult?.time ?? draft.time,
+    });
+
+    setProcessing(false);
+    navigate('/new/info');
   }, [draft.date, update, navigate]);
 
   /* ── 文件处理 ── */

@@ -81,6 +81,52 @@
   color: var(--color-accent);
 }
 
+/* 抠图未完成/失败状态 */
+.info-cutout-preview--no-cutout {
+  padding-bottom: var(--spacing-2);
+}
+
+.info-cutout-preview__no-cutout-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 200, 60, 0.9);
+  color: var(--color-tea-800);
+  font-family: var(--font-family-body);
+  font-size: 11px;
+  font-weight: 500;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.info-cutout-preview__retry-hint {
+  margin: var(--spacing-2) 0 0 0;
+  font-family: var(--font-family-body);
+  font-size: var(--text-xs);
+  color: var(--color-text-hint);
+  text-align: center;
+}
+
+.info-cutout-preview__retry-link {
+  background: none;
+  border: none;
+  color: var(--color-accent);
+  font-family: var(--font-family-body);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.info-cutout-preview__retry-link:hover {
+  color: var(--color-accent-dark, #a83b2e);
+}
+
 /* 叉掉后的重新上传区 */
 .info-cutout-preview--dismissed {
   padding: var(--spacing-3);
