@@ -14,15 +14,31 @@ export const Step3Cutout = memo(function Step3Cutout() {
   const [processing, setProcessing] = useState(false);
   const [mode, setMode] = useState<'local' | 'removebg'>('local');
 
-  // Phase 9 将接入真实 AI 抠图，目前模拟处理流程
-  const handleProcessCutout = useCallback(() => {
+  const handleProcessCutout = useCallback(async () => {
     if (!draft.photoDataUrl) return;
     setProcessing(true);
-    // 模拟：暂时直接复用原图作为"抠图结果"
-    setTimeout(() => {
-      update({ cutoutDataUrl: draft.photoDataUrl });
+    try {
+      const { removeBackground } = await import('@imgly/background-removal');
+      const blob = await removeBackground(draft.photoDataUrl, {
+        model: 'medium',
+        publicPath: import.meta.env.BASE_URL,
+        output: { format: 'image/png' },
+        progress: (key: string, current: number, total: number) => {
+          console.log(`[抠图] ${key}: ${Math.round((current / total) * 100)}%`);
+        },
+      });
+      const cutoutDataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+      update({ cutoutDataUrl });
+    } catch (err) {
+      console.error('AI 抠图失败:', err);
+    } finally {
       setProcessing(false);
-    }, 1200);
+    }
   }, [draft.photoDataUrl, update]);
 
   const handleRetry = useCallback(() => {
