@@ -23,6 +23,4 @@ dist-ssr
 *.sln
 *.sw?
 
-# AI 抠图模型缓存文件（无后缀的哈希文件名，运行时从 CDN 下载）
-public/*
-!public/*.*
+# AI 抠图模型缓存 — 部署到 GitHub Pages 供国内用户使用
