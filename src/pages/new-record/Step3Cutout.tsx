@@ -21,7 +21,7 @@ export const Step3Cutout = memo(function Step3Cutout() {
       const { removeBackground } = await import('@imgly/background-removal');
       const blob = await removeBackground(draft.photoDataUrl, {
         model: 'medium',
-        publicPath: import.meta.env.BASE_URL,
+        publicPath: new URL(import.meta.env.BASE_URL, location.origin).href,
         output: { format: 'image/png' },
         progress: (key: string, current: number, total: number) => {
           console.log(`[抠图] ${key}: ${Math.round((current / total) * 100)}%`);

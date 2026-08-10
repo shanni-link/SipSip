@@ -33,6 +33,9 @@ export default defineConfig({
 
       // Service Worker (Workbox)
       workbox: {
+        // 立即激活新 SW，不等旧 tabs 关闭
+        skipWaiting: true,
+        clientsClaim: true,
         // 预缓存静态资源
         globPatterns: ['**/*.{js,css,html,svg,png,wasm,woff2}'],
         // 运行时缓存：Google Fonts

@@ -111,6 +111,21 @@
   text-align: center;
 }
 
+.info-cutout-preview__error-msg {
+  margin: var(--spacing-1) 0 0 0;
+  padding: var(--spacing-1) var(--spacing-2);
+  font-family: var(--font-family-body);
+  font-size: 10px;
+  color: var(--color-accent);
+  text-align: center;
+  background: rgba(201, 74, 58, 0.06);
+  border-radius: var(--radius-sm);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .info-cutout-preview__retry-link {
   background: none;
   border: none;

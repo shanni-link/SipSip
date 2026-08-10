@@ -9,8 +9,8 @@ import './Step1Photo.css';
 
 /* ═══════════════════════ 常量 ═══════════════════════ */
 
-/** 抠图超时（small 模型 ~44MB，给 120s，国内 GitHub Pages 较慢） */
-const CUTOUT_TIMEOUT_MS = 120_000;
+/** 抠图超时（small 模型 ~44MB，给 300s，国内 GitHub Pages 较慢） */
+const CUTOUT_TIMEOUT_MS = 300_000;
 
 /* ═══════════════════════ Step1Photo ═══════════════════════ */
 
@@ -67,12 +67,19 @@ export const Step1Photo = memo(function Step1Photo() {
 
     // 2. AI 抠图（可选，失败不影响流程）
     let cutoutDataUrl: string | null = null;
+    let cutoutError: string | null = null;
     try {
       const { removeBackground } = await import('@imgly/background-removal');
 
+      // 使用完整 URL 确保 new URL(path, publicPath) 正确解析
+      const fullPublicPath = new URL(import.meta.env.BASE_URL, location.origin).href;
+
+      console.log('[抠图] publicPath:', fullPublicPath);
+      console.log('[抠图] 开始下载模型...');
+
       const cutoutTask = removeBackground(dataUrl, {
         model: 'small',
-        publicPath: import.meta.env.BASE_URL,
+        publicPath: fullPublicPath,
         debug: true,
         output: { format: 'image/png' },
         progress: (_key: string, current: number, total: number) => {
@@ -82,19 +89,22 @@ export const Step1Photo = memo(function Step1Photo() {
         },
       }).then(blob => processCutoutResult(blob));
 
-      const timeoutTask = new Promise<string>((_, reject) =>
-        setTimeout(() => reject(new Error('Cutout timeout')), CUTOUT_TIMEOUT_MS)
+      const timeoutTask = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error(`模型下载超时（${CUTOUT_TIMEOUT_MS / 1000}s），请检查网络后重试`)), CUTOUT_TIMEOUT_MS)
       );
 
       cutoutDataUrl = await Promise.race([cutoutTask, timeoutTask]);
-    } catch (err) {
-      console.warn('AI 抠图失败（可手动重试）:', err);
-      // cutoutDataUrl 保持 null，Step4Info 会显示原图 + 重试入口
+    } catch (err: any) {
+      const message = err?.message || String(err);
+      console.error('[抠图] 失败:', message, err);
+      cutoutError = message;
+      // cutoutDataUrl 保持 null，Step4Info 会显示原图 + 错误信息 + 重试入口
     }
 
     update({
       photoDataUrl,
       cutoutDataUrl,
+      cutoutError,
       date: exifResult?.date ?? draft.date,
       time: exifResult?.time ?? draft.time,
     });

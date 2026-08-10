@@ -11,6 +11,7 @@ export interface INewRecordDraft {
   time: string; // HH:MM
   /* Step 3 — 抠图 */
   cutoutDataUrl: string | null;
+  cutoutError: string | null;
   /* Step 4 — 信息 */
   name: string;
   brand: string;
@@ -41,6 +42,7 @@ function createEmptyDraft(): INewRecordDraft {
     date: getToday(),
     time: '',
     cutoutDataUrl: null,
+    cutoutError: null,
     name: '',
     brand: '',
     brandKey: '',

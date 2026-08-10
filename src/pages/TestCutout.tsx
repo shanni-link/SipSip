@@ -44,11 +44,12 @@ export default function TestCutout() {
         log(`✅ 导入成功 (${(performance.now() - startTime).toFixed(0)}ms)`);
 
         log('🔍 调用 removeBackground()...');
-        log('   配置: model=medium, publicPath=/, debug=true');
+        const publicPath = new URL(import.meta.env.BASE_URL, location.origin).href;
+        log(`   配置: model=medium, publicPath=${publicPath}, debug=true`);
 
         const blob = await removeBackground(dataUrl, {
           model: 'medium',
-          publicPath: import.meta.env.BASE_URL,
+          publicPath,
           debug: true,
           output: { format: 'image/png' },
           progress: (key: string, current: number, total: number) => {

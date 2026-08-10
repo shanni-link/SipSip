@@ -247,7 +247,7 @@ export const Step4Info = memo(function Step4Info() {
             </div>
           </div>
         ) : !cutoutDismissed && draft.photoDataUrl ? (
-          /* ⚠️ 抠图未完成/失败 — 显示原图，提供重试 */
+          /* ⚠️ 抠图未完成/失败 — 显示原图，显示具体错误 */
           <div className="info-cutout-preview info-cutout-preview--no-cutout">
             <div className="info-cutout-preview__img-wrap">
               <img
@@ -275,8 +275,14 @@ export const Step4Info = memo(function Step4Info() {
                 </svg>
               </button>
             </div>
+            {draft.cutoutError && (
+              <p className="info-cutout-preview__error-msg">{draft.cutoutError}</p>
+            )}
             <p className="info-cutout-preview__retry-hint">
-              <button className="info-cutout-preview__retry-link" onClick={() => navigate('/new/photo')}>
+              <button className="info-cutout-preview__retry-link" onClick={() => {
+                update({ cutoutDataUrl: null, cutoutError: null });
+                navigate('/new/photo');
+              }}>
                 返回重新拍照
               </button>
               <span> 或直接填写下方信息后保存（无抠图）</span>
